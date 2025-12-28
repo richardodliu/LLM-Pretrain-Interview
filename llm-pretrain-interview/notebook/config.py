@@ -1,5 +1,4 @@
-from dataclasses import dataclass, field
-from typing import Optional, Literal
+from dataclasses import dataclass
 
 @dataclass
 class ModelArgs:
@@ -11,7 +10,7 @@ class ModelArgs:
     num_attention_heads: int = 16
     kv_channels: int = 128
     seq_length: int = 4096
-    max_position_embeddings: int = 40960
+    max_position_embeddings: int = 4096
     
     # Attention & Normalization
     group_query_attention: bool = True
