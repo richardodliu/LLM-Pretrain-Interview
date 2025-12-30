@@ -57,6 +57,8 @@ class ModelConfig:
     init_method_std: float = 0.02
     split_qkv_init_mode: str = "head"
 
+config = ModelConfig()
+
 
 class SwiGLUBlock(nn.Module):
     def __init__(self, config: ModelConfig):
