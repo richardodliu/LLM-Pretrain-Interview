@@ -1,25 +1,10 @@
 # REFERENCES.md
 
-**版本**: 2.1
+**版本**: 3.4
 
-**最后更新**: 2025-12-30
+**最后更新**: 2026-01-02
 
 **用途**: 汇总本知识库涉及的所有官方资源、相关框架和核心论文，供模型编写文档和读者学习时参考
-
-**版本 2.1 新增**:
-- 激活检查点（Gradient Checkpointing）相关论文：Chen et al. (2016), Griewank & Walther (2000), Jain et al. (2020)
-- 更新55.1扩展文档知识点映射
-
-**版本 2.0 新增**:
-- NVIDIA 生态: NCCL、NeMo Framework详细资源
-- PyTorch 工具: torchao量化库
-- GPU 编程: Triton、cuDNN、FlashInfer
-- 边缘推理: ExecuTorch、llama.cpp、MLC LLM
-- 量化工具: BitsAndBytes、AutoGPTQ、torchao
-- 微调工具: Axolotl
-- 推理服务: SGLang、HuggingFace TGI
-- MLOps平台: Ray
-- 新增论文: LoRA、QLoRA、SmoothQuant、AWQ、Speculative Decoding
 
 ---
 
@@ -55,6 +40,14 @@
 | NVIDIA Apex | https://github.com/NVIDIA/apex | 混合精度和分布式训练工具 |
 | Apex 文档 | https://nvidia.github.io/apex/amp.html | Apex AMP 文档 |
 
+### 科学计算与数据处理
+
+| 资源 | 链接 | 说明 |
+|------|------|------|
+| NumPy Documentation | https://numpy.org/doc/stable/ | NumPy官方文档 |
+| NumPy memmap | https://numpy.org/doc/stable/reference/generated/numpy.memmap.html | 内存映射数组API |
+| NumPy ndarray | https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html | ndarray基础类 |
+
 ### DeepSpeed
 
 | 资源 | 链接 | 说明 |
@@ -82,11 +75,8 @@
 | 资源 | 链接 | 说明 |
 |------|------|------|
 | HuggingFace Transformers | https://huggingface.co/docs/transformers | 模型参考实现 |
-| HuggingFace Accelerate Megatron | https://huggingface.co/docs/accelerate/en/usage_guides/megatron_lm | Accelerate Megatron集成 |
+| HuggingFace Accelerate | https://huggingface.co/docs/accelerate/index | Accelerate 集成 |
 | Mamba GitHub | https://github.com/state-spaces/mamba | SSM架构实现 |
-| DeepSeek-V2 GitHub | https://github.com/deepseek-ai/DeepSeek-V2 | DeepSeek-V2 MoE模型 |
-| DeepSeek-V3 GitHub | https://github.com/deepseek-ai/DeepSeek-V3 | DeepSeek-V3模型 |
-| Qwen GitHub | https://github.com/QwenLM/Qwen | 阿里通义千问 |
 
 ### GPU 编程与内核优化
 
@@ -95,21 +85,8 @@
 | OpenAI Triton 官网 | https://triton-lang.org/ | Triton编程语言官网 |
 | Triton GitHub | https://github.com/triton-lang/triton | GPU编程语言和编译器 |
 | OpenAI Triton 博客 | https://openai.com/index/triton/ | Triton介绍博客 |
-| NVIDIA Triton 技术博客 | https://developer.nvidia.com/blog/openai-triton-on-nvidia-blackwell-boosts-ai-performance-and-programmability/ | Blackwell架构支持 |
 | NVIDIA cuDNN | https://developer.nvidia.com/cudnn | GPU加速深度学习基础库 |
 | cuDNN 文档 | https://docs.nvidia.com/deeplearning/cudnn/latest/ | cuDNN官方文档 |
-
-### 边缘与移动端推理
-
-| 资源 | 链接 | 说明 |
-|------|------|------|
-| PyTorch ExecuTorch | https://pytorch.org/projects/executorch/ | PyTorch边缘设备推理框架 |
-| ExecuTorch GitHub | https://github.com/pytorch/executorch | 移动/嵌入式AI推理 |
-| llama.cpp GitHub | https://github.com/ggml-org/llama.cpp | C/C++ LLM推理,量化支持 |
-| MLC LLM GitHub | https://github.com/mlc-ai/mlc-llm | Apache TVM通用LLM部署引擎 |
-| MLC LLM 文档 | https://llm.mlc.ai/docs/get_started/introduction | MLC LLM官方文档 |
-| HuggingFace TGI | https://github.com/huggingface/text-generation-inference | 大模型文本生成推理工具包 |
-| TGI 文档 | https://huggingface.co/docs/text-generation-inference | TGI官方文档 |
 
 ### 量化工具
 
@@ -118,9 +95,7 @@
 | PyTorch AO (torchao) | https://github.com/pytorch/ao | PyTorch原生量化和稀疏库 |
 | torchao 文档 | https://docs.pytorch.org/ao/stable/ | torchao官方文档 |
 | BitsAndBytes GitHub | https://github.com/bitsandbytes-foundation/bitsandbytes | k-bit量化(8-bit, 4-bit, QLoRA) |
-| BitsAndBytes HF 文档 | https://huggingface.co/docs/transformers/en/quantization/bitsandbytes | BitsAndBytes集成文档 |
-| AutoGPTQ GitHub | https://github.com/AutoGPTQ/AutoGPTQ | GPTQ算法量化工具 (已归档) |
-| AutoGPTQ 文档 | https://autogptq.github.io/AutoGPTQ/ | AutoGPTQ官方文档 |
+| GPTQModel GitHub | https://github.com/ModelCloud/GPTQModel | LLM量化工具 |
 
 ### LLM 微调工具
 
@@ -177,13 +152,17 @@
 | 论文 | 作者 | 年份 | 会议/期刊 | arXiv |
 |------|------|------|-----------|-------|
 | Megatron-LM (张量并行) | Shoeybi et al. | 2019 | arXiv | 1909.08053 |
-| Megatron-LM v2 (流水线并行) | Narayanan et al. | 2021 | SC | 2104.04473 |
+| **Megatron-LM v2 (序列并行)** | **Narayanan et al.** | **2021** | **SC** | **2104.04473** |
 | GPipe | Huang et al. | 2019 | NeurIPS | 1811.06965 |
 | PipeDream | Narayanan et al. | 2019 | SOSP | - |
+| **Reducing Activation Recomputation** | **Korthikanti et al.** | **2023** | **MLSys** | **2205.05198** |
+| **Alpa: Automating Inter- and Intra-Operator Parallelism** | **Zheng et al.** | **2022** | **OSDI** | **2201.12023** |
+| **Varuna: Scalable, Low-cost Training** | **Athlur et al.** | **2022** | **EuroSys** | **2111.04007** |
 | ZeRO: Memory Optimizations | Rajbhandari et al. | 2020 | SC | 1910.02054 |
 | ZeRO-Offload | Ren et al. | 2021 | ATC | 2101.06840 |
 | ZeRO++ | Wang et al. | 2023 | arXiv | 2306.10209 |
 | FSDP (Fully Sharded Data Parallel) | Zhao et al. | 2023 | VLDB | 2304.11277 |
+| **DeepSpeed-MoE: Advancing MoE Inference and Training** | **Rajbhandari et al.** | **2022** | **ICML** | **2201.05596** |
 | Ring Attention | Liu et al. | 2023 | arXiv | 2310.01889 |
 | Context Parallelism for Million-Token Inference | - | 2024 | arXiv | 2411.01783 |
 
@@ -211,8 +190,14 @@
 
 | 论文 | 作者 | 年份 | 会议/期刊 | arXiv |
 |------|------|------|-----------|-------|
-| Switch Transformers | Fedus et al. | 2022 | JMLR | 2101.03961 |
+| Outrageously Large Neural Networks (Sparsely-Gated MoE) | Shazeer et al. | 2017 | ICLR | 1701.06538 |
 | GShard | Lepikhin et al. | 2021 | ICLR | 2006.16668 |
+| Switch Transformers | Fedus et al. | 2022 | JMLR | 2101.03961 |
+| **ST-MoE: Designing Stable and Transferable MoE** | **Zoph et al.** | **2022** | **arXiv** | **2202.08906** |
+| Expert Choice Routing | Zhou et al. | 2022 | NeurIPS | 2202.09368 |
+| SMEAR: Soft Merging of Experts with Adaptive Routing | Muqeeth et al. | 2023 | arXiv | 2306.03745 |
+| Soft Mixture of Experts | Puigcerver et al. | 2023 | arXiv | 2308.00951 |
+| **Global Load Balancing Loss for MoE** | **Qiu et al.** | **2025** | **arXiv** | **2501.11873** |
 | DeepSeek-V2 (MLA + MoE) | DeepSeek | 2024 | arXiv | 2405.04434 |
 | **DeepSeek-V3** | DeepSeek | 2024 | arXiv | 2412.19437 |
 | Mixtral of Experts | Mistral AI | 2024 | arXiv | 2401.04088 |
@@ -236,11 +221,60 @@
 
 | 论文 | 作者 | 年份 | 会议/期刊 | arXiv |
 |------|------|------|-----------|-------|
+| **A Stochastic Approximation Method** | **Robbins & Monro** | **1951** | **Annals of Mathematical Statistics** | - |
+| **Some methods of speeding up the convergence of iteration methods** | **Polyak** | **1964** | **USSR Computational Mathematics** | - |
+| A method for solving a convex programming problem with convergence rate O(1/k²) | Nesterov | 1983 | Soviet Mathematics Doklady | - |
+| On the importance of initialization and momentum in deep learning | Sutskever et al. | 2013 | ICML | - |
+| An overview of gradient descent optimization algorithms | Ruder | 2016 | arXiv | 1609.04747 |
+| A differential equation for modeling Nesterov's accelerated gradient method | Su, Boyd, & Candès | 2014 | JMLR | - |
+| **AdaGrad: Adaptive Subgradient Methods** | **Duchi, Hazan, & Singer** | **2011** | **JMLR** | - |
+| **RMSProp** | **Tieleman & Hinton** | **2012** | **Coursera Lecture 6.5** | - |
+| **ADADELTA: An Adaptive Learning Rate Method** | **Zeiler** | **2012** | **arXiv** | **1212.5701** |
 | Adam | Kingma & Ba | 2015 | ICLR | 1412.6980 |
 | AdamW (Decoupled Weight Decay) | Loshchilov & Hutter | 2019 | ICLR | 1711.05101 |
+| **AMSGrad (On the Convergence of Adam and Beyond)** | **Reddi, Kale, & Kumar** | **2018** | **ICLR** | **1904.09237** |
+| **Lion: Symbolic Discovery of Optimization Algorithms** | **Chen et al.** | **2023** | **arXiv** | **2302.06675** |
+| **Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour** | **Goyal et al.** | **2017** | **arXiv** | **1706.02677** |
+| **On Large-Batch Training for Deep Learning: Generalization Gap and Sharp Minima** | **Keskar et al.** | **2017** | **ICLR** | **1609.04836** |
+| **Cyclical Learning Rates for Training Neural Networks** | **Smith** | **2017** | **IEEE WACV** | **1506.01186** |
 | Mixed Precision Training | Micikevicius et al. | 2018 | ICLR | 1710.03740 |
+| **FP8 Formats for Deep Learning** | **Micikevicius et al.** | **2022** | **arXiv** | **2209.05433** |
+| **A Study of BFLOAT16 for Deep Learning Training** | **Kalamkar et al.** | **2019** | **arXiv** | **1905.12322** |
+| **Deep Learning with Limited Numerical Precision** | **Gupta et al.** | **2015** | **ICML** | - |
+| **Training Deep Neural Networks with 8-bit Floating Point Numbers** | **Wang et al.** | **2018** | **NeurIPS** | **1812.08011** |
+| **Hybrid 8-bit Floating Point (HFP8) Training** | **Sun et al.** | **2019** | **NeurIPS** | **1905.12334** |
+| **BinaryConnect: Training DNNs with binary weights** | **Courbariaux et al.** | **2015** | **NeurIPS** | **1511.00363** |
 | LoRA (Low-Rank Adaptation) | Hu et al. | 2021 | ICLR | 2106.09685 |
 | QLoRA (4-bit Quantization) | Dettmers et al. | 2023 | NeurIPS | 2305.14314 |
+
+### 数值稳定性基础
+
+| 论文 | 作者 | 年份 | 会议/期刊 | arXiv |
+|------|------|------|-----------|-------|
+| **Rounding Errors in Algebraic Processes** | **Wilkinson, J. H.** | **1963** | **Prentice Hall (专著)** | - |
+| **Accuracy and Stability of Numerical Algorithms (2nd ed.)** | **Higham, N. J.** | **2002** | **SIAM (专著)** | - |
+| **Accurately computing the log-sum-exp and softmax functions** | **Blanchard, P., Higham, D. J., & Higham, N. J.** | **2019** | **arXiv** | **1909.03469** |
+| **Transformers without Tears: Improving the Normalization of Self-Attention** | **Nguyen, T. Q., & Salazar, J.** | **2019** | **arXiv** | **1910.05895** |
+
+### 二阶优化方法
+
+| 论文 | 作者 | 年份 | 会议/期刊 | arXiv |
+|------|------|------|-----------|-------|
+| **Numerical Optimization (教科书)** | **Nocedal & Wright** | **2006** | **Springer** | - |
+| **On the limited memory BFGS method for large scale optimization** | **Liu & Nocedal** | **1989** | **Mathematical Programming** | - |
+| **Natural Gradient Works Efficiently in Learning** | **Amari** | **1998** | **Neural Computation** | - |
+| Revisiting Natural Gradient for Deep Networks | Pascanu & Bengio | 2013 | arXiv | 1301.3584 |
+| **Optimizing Neural Networks with Kronecker-factored Approximate Curvature (K-FAC)** | **Martens & Grosse** | **2015** | **ICML** | **1503.05671** |
+| A Kronecker-factored approximate Fisher matrix for convolution layers | Grosse & Martens | 2016 | ICML | - |
+| Kronecker-Factored Curvature Approximations for Recurrent Neural Networks | Martens, Ba, & Johnson | 2018 | ICLR | - |
+| Deep learning via Hessian-free optimization | Martens | 2010 | ICML | - |
+| Identifying and attacking the saddle point problem in high-dimensional non-convex optimization | Dauphin et al. | 2014 | NeurIPS | 1406.2572 |
+| Empirical Analysis of the Hessian of Over-Parametrized Neural Networks | Sagun et al. | 2017 | ICLR Workshop | 1706.04454 |
+| Shampoo: Preconditioned Stochastic Tensor Optimization | Gupta et al. | 2018 | ICML | 1802.09568 |
+| Scalable Second Order Optimization for Deep Learning | Anil et al. | 2020 | arXiv | 2002.09018 |
+| ADAHESSIAN: An Adaptive Second Order Optimizer for Machine Learning | Yao et al. | 2020 | AAAI | 2006.00719 |
+| A Progressive Batching L-BFGS Method for Machine Learning | Bollapragada et al. | 2018 | ICML | - |
+| A Multi-Batch L-BFGS Method for Machine Learning | Berahas et al. | 2016 | NeurIPS | - |
 
 ### 内存优化：激活检查点（Gradient Checkpointing）
 
@@ -281,6 +315,22 @@
 | Scaling Laws for Neural LMs | Kaplan et al. | 2020 | arXiv | 2001.08361 |
 | Chinchilla (Training Compute-Optimal LLMs) | Hoffmann et al. | 2022 | NeurIPS | 2203.15556 |
 
+### 数据工程与预处理
+
+| 论文 | 作者 | 年份 | 会议/期刊 | arXiv |
+|------|------|------|-----------|-------|
+| Where Is My Training Bottleneck? Hidden Trade-Offs in Deep Learning Preprocessing Pipelines | Lim et al. | 2022 | arXiv | 2202.08679 |
+
+### Tokenization技术
+
+| 论文/资源 | 作者 | 年份 | 会议/期刊 | arXiv/链接 |
+|------|------|------|-----------|-------|
+| **Neural Machine Translation of Rare Words with Subword Units (BPE)** | **Sennrich, Haddow, & Birch** | **2016** | **ACL** | **1508.07909** |
+| **Japanese and Korean Voice Search (WordPiece)** | **Schuster & Nakajima** | **2012** | **IEEE ICASSP** | - |
+| **SentencePiece: A simple and language independent approach** | **Kudo & Richardson** | **2018** | **EMNLP** | **1808.06226** |
+| **TikToken (OpenAI Tokenizer)** | **OpenAI** | **2022** | **GitHub** | https://github.com/openai/tiktoken |
+| **HuggingFace Tokenizers** | **HuggingFace** | **2020** | **GitHub** | https://github.com/huggingface/tokenizers |
+
 ---
 
 ## 📊 论文按知识点映射
@@ -305,11 +355,25 @@
 | 56-60 | 张量并行 | Megatron-LM (2019) |
 | 61-67 | 流水线并行 | GPipe, Megatron-LM v2 |
 | 68-72 | ZeRO/FSDP | ZeRO (2020), FSDP (2023) |
-| 73-75 | 序列/上下文并行 | Ring Attention (2023) |
+| **73** | **序列并行(Sequence Parallelism)** | **Megatron-LM v2 (Narayanan et al., 2021), Korthikanti et al. (2023)** |
+| 74 | 上下文并行(Context Parallelism) | Ring Attention (2023) |
+| **75** | **序列并行与张量并行组合** | **Megatron-LM v2 (Narayanan et al., 2021), Korthikanti et al. (2023)** |
 | 76-80 | MoE | Switch Transformers, DeepSeek-V3 |
-| 84-85 | Adam/AdamW | Adam (2015), AdamW (2019) |
-| 86 | LoRA/QLoRA | LoRA (2021), QLoRA (2023) |
+| **77** | **MoE路由算法** | **Shazeer et al. (2017), Fedus et al. (2022), Zhou et al. (2022), Soft MoE (2023)** |
+| **78** | **MoE负载均衡技术** | **Switch Transformers (Fedus et al., 2022), ST-MoE (Zoph et al., 2022), Global Load Balancing (Qiu et al., 2025)** |
+| **79** | **MoE专家并行实现** | **GShard (Lepikhin et al., 2021), Switch Transformers (Fedus et al., 2022), DeepSpeed-MoE (Rajbhandari et al., 2022)** |
+| **80** | **共享专家与稀疏专家** | **DeepSeek-V2 (2024), DeepSeek-V3 (2024), Switch Transformers (Fedus et al., 2022)** |
+| **81** | **随机梯度下降(SGD)与动量** | **Robbins & Monro (1951), Polyak (1964), Sutskever et al. (2013), Goyal et al. (2017), Keskar et al. (2017), Smith (2017)** |
+| **82** | **Nesterov加速梯度(NAG)** | **Nesterov (1983), Sutskever et al. (2013), Ruder (2016), Su et al. (2014)** |
+| **83** | **自适应学习率：AdaGrad/RMSProp** | **Duchi et al. (2011), Tieleman & Hinton (2012), Zeiler (2012), Ruder (2016)** |
+| **84** | **Adam优化器详解** | **Kingma & Ba (2015), Reddi et al. (2018)** |
+| **87** | **二阶优化方法概览** | **Newton法, L-BFGS (Liu & Nocedal, 1989), 自然梯度 (Amari, 1998), K-FAC (Martens & Grosse, 2015)** |
+| **88** | **分布式优化器详解** | **ZeRO (Rajbhandari et al., 2020), FSDP (Zhao et al., 2023), Megatron-LM v2 (2021)** |
 | 93-96 | 混合精度 | Mixed Precision Training (2018) |
+| **95** | **FP8训练与TransformerEngine** | **FP8 Formats for Deep Learning (Micikevicius et al., 2022)** |
+| **96** | **数值稳定性实践** | **Wilkinson (1963), Higham (2002), Blanchard et al. (2019), Nguyen & Salazar (2019)** |
+| **97** | **数据预处理与Tokenization** | **Sennrich et al. (2016), Schuster & Nakajima (2012), Kudo & Richardson (2018)** |
+| **98** | **数据加载与索引化** | **Lim et al. (2022), NumPy memmap 文档** |
 | 95 | FP8训练 | Transformer Engine文档 |
 
 ---
@@ -329,6 +393,8 @@
 | Tri Dao 博客 | https://tridao.me/ | FlashAttention作者博客 |
 | Mamba-2 技术博客 | https://tridao.me/blog/2024/mamba2-part1-model/ | Mamba-2详解 |
 | vLLM 技术博客 | https://blog.vllm.ai/2023/06/20/vllm.html | PagedAttention原理 |
+| Oxford Protein Informatics - mmap | https://www.blopig.com/blog/2019/08/mmap-vs-zarr-vs-hdf5/ | mmap vs Zarr vs HDF5性能对比 |
+| Python Speed - mmap tutorial | https://pythonspeed.com/articles/mmap-vs-zarr-hdf5/ | mmap使用教程 |
 
 ---
 

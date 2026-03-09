@@ -22,7 +22,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | **TODO.md** | 进度追踪、里程碑、任务列表 | Claude模型 |
 | **REFERENCES.md** | 官方资源、框架对比、核心论文汇总 | Claude模型 |
 
-**重要**: 编写文档时必须参考 `TEMPLATE.md` 的标准结构。
+**重要**: 
+- 编写文档时必须参考 `TEMPLATE.md` 的标准结构。
+- 文档完成之后同步更新 `TODO.md`
+- 同步将重要的参考文献加入 `REFERENCES.md`
 
 ---
 
@@ -32,6 +35,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 # 查阅 OVERVIEW.md 获取知识点描述和代码位置
 # 查阅 TODO.md 确认优先级和当前状态
+# 查看当前文件夹下知识点文档的进展情况
 ```
 
 ### 2. 代码验证
@@ -74,10 +78,15 @@ ls -la megatron/core/[相关路径]/[文件名].py
 # 更新 TODO.md
 - 将文档状态从 "📝 待编写" 改为 "✅ 已完成"
 - 更新整体进度百分比
-- 添加完成记录到"最新完成任务"部分
 ```
 
-### 7. 文档命名规范
+### 7. 更新文献
+```markdown
+# 更新 REFERENCES.md
+- 将新增加知识点中重要的参考文献加入
+- 更新相关学习资源
+
+### 8. 文档命名规范
 ```
 格式: {编号:02d}-{英文标题}.md
 示例: 23-scaled-dot-product-attention.md

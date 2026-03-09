@@ -579,28 +579,49 @@ megatron/
 - Ring拓扑的构建
 - 实际性能测试
 
-#### 55. 梯度累积技术详解
-> **代码位置**: `megatron/core/distributed/param_and_grad_buffer.py`, `pretrain_gpt.py` (gradient_accumulation_steps)
-- 梯度累积的数学原理与等价性证明
-- 为什么需要梯度累积：显存限制 vs 大Batch Size
-- 梯度累积与全局Batch Size的关系：$\text{Global BS} = \text{Micro BS} \times \text{Accum Steps} \times \text{DP}$
-- 梯度累积的前向与反向传播流程
-- 梯度累积在分布式训练中的实现
-- 梯度累积与优化器更新的时机
-- 梯度累积对BatchNorm/LayerNorm的影响
-- 梯度累积的内存分析与性能权衡
-- 梯度累积步数的选择策略
-- Megatron中的梯度累积实现
+#### 55. 梯度同步优化：分桶与通信重叠
+> **代码位置**: `megatron/core/distributed/param_and_grad_buffer.py`, `megatron/core/distributed/distributed_data_parallel.py`
+- 梯度同步的性能瓶颈：串行通信 vs 并行计算
+- 梯度分桶(Gradient Bucketing)：将梯度划分为多个桶，逐桶通信
+- 通信-计算重叠(Communication-Computation Overlap)：异步AllReduce与反向传播重叠
+- 桶大小选择：25MB默认值的理论依据与性能权衡
+- Hook机制：基于`register_hook`的自动触发
+- CUDA Stream管理：多流并发与同步点
+- FP32梯度累加优化：混合精度下的精度保证
+- Megatron-LM的_ParamAndGradBucket实现
+- 性能分析：理想情况下可实现接近100%的通信隐藏
+- 与其他并行策略的协同：DP+TP+PP组合下的梯度同步
 
-#### 55.1 梯度累积与激活检查点详解（扩展卷）⭐
-> **代码位置**: `megatron/core/num_microbatches_calculator.py`, `megatron/core/transformer/transformer_block.py:417-530`
-- 梯度累积技术：模拟大batch训练的核心技术，包含数学等价性证明、与DDP的集成机制、micro-batch调度策略
-- 激活检查点（Gradient Checkpointing）完整技术体系
-- 数学基础：Chen et al. (2016) 算法，$O(L/k)$ (uniform) vs $O(\sqrt{L})$ (optimal) 内存复杂度分析，时间-空间权衡
-- Megatron实现：201行核心代码详解，`CheckpointFunction`自定义autograd实现，RNG状态管理保证dropout一致性
-- 重计算策略：Full/Selective/Block三种策略对比，TP分布式激活处理，FP8/FP4混合精度支持
-- 组合优化：梯度累积与激活检查点联合使用的最佳实践，配置矩阵（4×3组合），内存与吞吐量权衡分析
-- 工程实践：常见问题诊断（OOM、loss不收敛、性能下降），MemoryMonitor调试工具，生产环境配置建议
+#### 55.1 梯度累积技术详解（扩展卷）⭐
+> **代码位置**: `megatron/core/num_microbatches_calculator.py`, `megatron/training/training.py`
+>
+> **激活检查点**: `megatron/core/transformer/transformer_block.py:417-530`, `megatron/core/tensor_parallel/random.py:407-480`, `megatron/core/transformer/transformer_config.py:308-331`
+
+**梯度累积（Gradient Accumulation）**：
+- 梯度累积的数学原理与等价性证明：$\nabla_\theta \mathcal{L}(\theta; \mathcal{B}) = \sum_{k=1}^{K} \frac{|\mathcal{B}_k|}{N} \nabla_\theta \mathcal{L}(\theta; \mathcal{B}_k)$
+- 核心问题：显存限制 vs 大Batch Size，梯度累积的解决方案
+- 全局Batch Size计算公式：$\text{Global BS} = \text{Micro BS} \times \text{累积步数} \times \text{DP度}$
+- 梯度累积的前向与反向传播流程：多次backward()，一次step()
+- 梯度累积在分布式训练中的实现：与DDP的集成机制
+- 梯度累积与优化器更新的时机：梯度清零与状态更新
+- 梯度累积对BatchNorm/LayerNorm的影响分析
+- FP32梯度累加与混合精度训练的配合
+- 梯度累积的内存分析：激活值内存 vs 梯度内存
+- 性能权衡：通信开销降低 vs 计算时间增加
+- 累积步数选择策略：基于显存容量和目标batch size
+- Megatron中的num_microbatches_calculator实现
+- 动态Batch Size Rampup策略：训练初期小batch，逐步增大
+
+**激活检查点（Activation Checkpointing）**：
+- **数学原理（第4.5节）**：标准反向传播的内存问题 $O(L \cdot B \cdot S \cdot H)$，激活检查点的内存-计算权衡定理，Uniform/Selective/Block策略的数学推导
+- **算法伪代码（第5.5节）**：Uniform Checkpointing算法、Selective Checkpointing算法、CheckpointFunction实现算法、组合策略算法
+- **代码实现（第6.5节）**：CheckpointFunction的forward/backward机制、RNG状态管理、detach操作、TransformerBlock集成
+- **三种策略对比**：
+  - Uniform: 每k层设置检查点，内存节省 $1-1/k$，重计算开销 ~1× forward
+  - Selective: 仅对Attention设置检查点，内存节省50-60%，重计算开销15-30%
+  - Block: 仅对前N层设置检查点，灵活控制内存-计算权衡
+- **与梯度累积的组合**：同时优化激活值内存和梯度内存，实现乘法级内存节省，案例显示可达99.95%内存降低
+- **关键实现细节**：RNG状态保存/恢复确保dropout一致性、detach切断计算图防止梯度泄漏、no_grad → enable_grad的模式切换
 
 ---
 
@@ -943,7 +964,7 @@ megatron/
 - 梯度裁剪的数学分析
 - 梯度裁剪的实践建议
 
-#### 91. 优化器选择与调优指南
+#### 91. 优化器调优指南
 - 不同优化器的适用场景
 - 超参数调优策略
 - 学习率搜索方法
