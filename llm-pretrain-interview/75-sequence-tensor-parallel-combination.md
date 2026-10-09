@@ -3,7 +3,7 @@
 **版本**: 1.0
 **作者**: LLM预训练研究团队
 **创建日期**: 2026-01-01
-**最后更新**: 2026-01-01
+**最后更新**: 2026-05-10
 
 ---
 
@@ -58,12 +58,12 @@
 
 ### 1.4 代码位置
 
-> **核心通信原语**: `megatron/core/tensor_parallel/mappings.py:276-597`
+> **核心通信原语**: `megatron/core/tensor_parallel/mappings.py`
 > **序列并行配置**: `megatron/core/transformer/transformer_config.py:118`
 > **LayerNorm集成**: `megatron/core/transformer/torch_norm.py:32`
-> **嵌入层集成**: `megatron/core/tensor_parallel/layers.py:286-294`
+> **嵌入层集成**: `megatron/core/tensor_parallel/layers.py`
 > **相关文件**:
-> - `megatron/core/transformer/transformer_layer.py:439-497` (TransformerLayer 前向传播)
+> - `megatron/core/transformer/transformer_layer.py` (TransformerLayer 前向传播)
 > - `megatron/core/transformer/multi_latent_attention.py:546-576` (MLA 中的 SP)
 > - `megatron/core/transformer/moe/shared_experts.py:167-251` (MoE 中的 SP)
 
@@ -469,7 +469,7 @@ Output: ∂L/∂X_emb ∈ ℝ^(s×b×h)       (梯度，完整序列)
 
 #### 6.1.1 ReduceScatter 通信原语
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:351-377`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _ReduceScatterToSequenceParallelRegion(torch.autograd.Function):
@@ -536,7 +536,7 @@ class _ReduceScatterToSequenceParallelRegion(torch.autograd.Function):
 def _reduce_scatter_along_first_dim(input_, group, input_split_sizes=None, use_global_buffer=False):
     """实际执行 ReduceScatter 的底层函数
 
-    megatron/core/tensor_parallel/mappings.py:155-194
+    megatron/core/tensor_parallel/mappings.py
     """
     assert group is not None, "group should not be None"
     world_size = group.size()
@@ -585,7 +585,7 @@ def _reduce_scatter_along_first_dim(input_, group, input_split_sizes=None, use_g
 
 #### 6.1.2 AllGather 通信原语
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:296-349`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _GatherFromSequenceParallelRegion(torch.autograd.Function):
@@ -663,7 +663,7 @@ gather_from_sequence_parallel_region(x, tensor_parallel_output_grad=False)
 
 #### 6.1.3 VocabParallelEmbedding 集成
 
-**文件路径**: `megatron/core/tensor_parallel/layers.py:286-295`
+**文件路径**: `megatron/core/tensor_parallel/layers.py`
 
 ```python
 class VocabParallelEmbedding(torch.nn.Module):
@@ -848,7 +848,7 @@ class TransformerConfig(ModelParallelConfig):
 
 ### 6.3 单元测试
 
-**测试文件**: `tests/unit_tests/tensor_parallel/test_mappings.py`（推测路径）
+**测试文件**: `tests/unit_tests/tensor_parallel/test_mappings.py`
 
 ```python
 import torch
@@ -2122,7 +2122,7 @@ hardware:
 
 ```bash
 #!/bin/bash
-# scripts/train_gpt3_175b_sp.sh
+# 示例脚本名: train_gpt3_175b_sp.sh
 
 # 环境变量
 export CUDA_DEVICE_MAX_CONNECTIONS=1

@@ -6,9 +6,9 @@
 > **代码位置**:
 > - `megatron/core/transformer/transformer_config.py:180-187` (window_size 配置)
 > - `megatron/core/transformer/utils.py:38-45, 451-467` (滑动窗口掩码生成)
-> - `megatron/core/transformer/dot_product_attention.py:93-99` (层级窗口判断)
-> - `megatron/core/fusions/fused_softmax.py:202-216, 321-322` (融合窗口Softmax)
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> - `megatron/core/transformer/dot_product_attention.py` (层级窗口判断)
+> - `megatron/core/fusions/fused_softmax.py, 321-322` (融合窗口Softmax)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 
@@ -131,10 +131,10 @@ $$
 3. **层级判断**: `megatron/core/transformer/utils.py:451-467`
    - `is_layer_window_attention()` - 判断某层是否使用窗口注意力
 
-4. **注意力计算**: `megatron/core/transformer/dot_product_attention.py:93-99`
+4. **注意力计算**: `megatron/core/transformer/dot_product_attention.py`
    - 在 `DotProductAttention.__init__()` 中配置窗口
 
-5. **融合 Softmax**: `megatron/core/fusions/fused_softmax.py:321-322`
+5. **融合 Softmax**: `megatron/core/fusions/fused_softmax.py`
    - 在 `forward_torch_softmax()` 中应用窗口掩码
 
 ---
@@ -940,7 +940,7 @@ def is_layer_window_attention(
 
 #### 6.2.1 DotProductAttention 中的窗口配置
 
-**文件路径**: `megatron/core/transformer/dot_product_attention.py:93-109`
+**文件路径**: `megatron/core/transformer/dot_product_attention.py`
 
 ```python
 class DotProductAttention(nn.Module):
@@ -991,7 +991,7 @@ class DotProductAttention(nn.Module):
 
 #### 6.2.2 FusedScaleMaskSoftmax 中的窗口掩码应用
 
-**文件路径**: `megatron/core/fusions/fused_softmax.py:202-216, 321-322`
+**文件路径**: `megatron/core/fusions/fused_softmax.py, 321-322`
 
 ```python
 class FusedScaleMaskSoftmax(nn.Module):

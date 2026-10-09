@@ -4,7 +4,7 @@
 > **作者**: Megatron-LM 研究团队
 > **日期**: 2025-12-31
 > **Megatron版本**: v0.12.0
-> **代码位置**: `megatron/core/tensor_parallel/layers.py:188-316`, `megatron/core/tensor_parallel/cross_entropy.py`
+> **代码位置**: `megatron/core/tensor_parallel/layers.py`, `megatron/core/tensor_parallel/cross_entropy.py`
 
 ---
 
@@ -38,7 +38,7 @@
 - GPT-3: 50,257
 - LLaMA: 32,000
 - Qwen: 151,643
-- GPT-4: 约100,000 (估计)
+- GPT-4: 公开资料未披露本文可核对的词表大小
 
 当词汇表较大时，Embedding和输出层的参数会占用大量内存：
 ```
@@ -627,7 +627,7 @@ AllReduce后，每个token位置恰好有一个非零贡献。
 
 ### 4.2 VocabParallelEmbedding类
 
-**代码位置**: `megatron/core/tensor_parallel/layers.py:188-316`
+**代码位置**: `megatron/core/tensor_parallel/layers.py`
 
 #### 4.2.1 类定义与初始化
 
@@ -1296,7 +1296,7 @@ $$
 
 ### 6.3 并行交叉熵前向传播
 
-**代码位置**: `megatron/core/tensor_parallel/cross_entropy.py:122-189`
+**代码位置**: `megatron/core/tensor_parallel/cross_entropy.py`
 
 #### 6.3.1 算法步骤
 
@@ -1443,7 +1443,7 @@ $$
 
 #### 6.4.2 并行梯度计算
 
-**代码位置**: `megatron/core/tensor_parallel/cross_entropy.py:191-216`
+**代码位置**: `megatron/core/tensor_parallel/cross_entropy.py`
 
 ```python
 def vocab_parallel_cross_entropy_backward(
@@ -1503,7 +1503,7 @@ def vocab_parallel_cross_entropy_backward(
 
 ### 6.5 完整的VocabParallelCrossEntropy类
 
-**代码位置**: `megatron/core/tensor_parallel/cross_entropy.py:16-217`
+**代码位置**: `megatron/core/tensor_parallel/cross_entropy.py`
 
 ```python
 class VocabParallelCrossEntropy:
@@ -2333,7 +2333,7 @@ vocab_parallel_embedding = VocabParallelEmbedding(
 )
 ```
 
-padding的token永远不会被使用，内存浪费可忽略。
+padding token通常不会出现在有效训练样本中；只要padding量相对词表很小，额外内存开销可忽略。
 
 **方案2: 不均匀切分**（复杂，不推荐）
 ```python
@@ -2786,4 +2786,3 @@ python -m torch.distributed.run --nproc_per_node=8 \
 
 **© 2025 大语言模型预训练研究著作项目**
 **基于 Megatron-LM v0.12.0**
-

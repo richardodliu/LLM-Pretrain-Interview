@@ -6,9 +6,9 @@
 > **代码位置**:
 > - `megatron/core/distributed/param_and_grad_buffer.py:155-194` (Reduce-Scatter实现)
 > - `megatron/core/distributed/param_and_grad_buffer.py:114-152` (AllGather实现)
-> - `megatron/core/tensor_parallel/mappings.py:1-420` (张量并行通信原语)
-> - `megatron/core/distributed/reduce_scatter_with_fp32_accumulation.py:1-93` (FP32累加优化)
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM仓库实际代码)
+> - `megatron/core/tensor_parallel/mappings.py` (张量并行通信原语)
+> - `megatron/core/distributed/reduce_scatter_with_fp32_accumulation.py` (FP32累加优化)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 
@@ -789,7 +789,7 @@ megatron/core/
 ### 7.2 Reduce-Scatter实现
 
 #### 代码位置
-`megatron/core/tensor_parallel/mappings.py:155-194`
+`megatron/core/tensor_parallel/mappings.py`
 
 ```python
 def _reduce_scatter_along_first_dim(input_, group, input_split_sizes=None, use_global_buffer=False):
@@ -896,7 +896,7 @@ ncclResult_t ncclReduceScatter(
 ### 7.3 AllGather实现
 
 #### 代码位置
-`megatron/core/tensor_parallel/mappings.py:114-152`
+`megatron/core/tensor_parallel/mappings.py`
 
 ```python
 def _gather_along_first_dim(input_, group, output_split_sizes=None, use_global_buffer=False):
@@ -1066,7 +1066,7 @@ FP32累加: (a + b) + c = a + (b + c)  (精度保持)
 
 #### 实现策略
 
-代码位置: `megatron/core/distributed/reduce_scatter_with_fp32_accumulation.py:42-93`
+代码位置: `megatron/core/distributed/reduce_scatter_with_fp32_accumulation.py`
 
 ```python
 def reduce_scatter_with_fp32_accumulation(
@@ -1170,7 +1170,7 @@ Local Sum: chunk_sum = sum([chunk_0, chunk_1, ..., chunk_{N-1}], dtype=FP32)
 
 ### 7.6 张量并行中的AllGather
 
-代码位置: `megatron/core/tensor_parallel/mappings.py:380-398`
+代码位置: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _AllGatherFromTensorParallelRegion(torch.autograd.Function):

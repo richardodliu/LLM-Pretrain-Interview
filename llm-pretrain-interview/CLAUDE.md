@@ -76,7 +76,7 @@ ls -la megatron/core/[相关路径]/[文件名].py
 ### 6. 更新进度
 ```markdown
 # 更新 TODO.md
-- 将文档状态从 "📝 待编写" 改为 "✅ 已完成"
+- 将文档状态更新为 "✅ 已完成"
 - 更新整体进度百分比
 ```
 
@@ -135,11 +135,11 @@ megatron/
 ```
 
 ### 关键类位置
-- `Attention`: `megatron/core/transformer/attention.py:1014-1349`
-- `DotProductAttention`: `megatron/core/transformer/dot_product_attention.py:100-350`
+- `Attention`: `megatron/core/transformer/attention.py`
+- `DotProductAttention`: `megatron/core/transformer/dot_product_attention.py`
 - `MLP`: `megatron/core/transformer/mlp.py:24-352`
 - `DistributedDataParallel`: `megatron/core/distributed/distributed_data_parallel.py`
-- `ColumnParallelLinear`: `megatron/core/tensor_parallel/layers.py:200-350`
+- `ColumnParallelLinear`: `megatron/core/tensor_parallel/layers.py`
 - `DistributedOptimizer`: `megatron/core/optimizer/distrib_optimizer.py`
 
 ---
@@ -243,5 +243,5 @@ A: **必须**使用 WebSearch 工具检索验证论文信息，不可编造。
 
 ---
 
-**最后更新**: 2025-12-30
+**最后更新**: 2026-05-10
 **Megatron-LM 版本**: v0.12.0

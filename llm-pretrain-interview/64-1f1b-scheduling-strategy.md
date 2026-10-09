@@ -13,7 +13,7 @@
 **Megatron-LM实现**：
 ```
 核心函数：forward_backward_pipelining_without_interleaving
-代码位置：megatron/core/pipeline_parallel/schedules.py:1967-2306
+代码位置：megatron/core/pipeline_parallel/schedules.py
 代码行数：~340行
 ```
 
@@ -193,7 +193,7 @@ M_activation_GPipe = 32 × 1.5 GB = 48 GB
 **主调度函数**：`forward_backward_pipelining_without_interleaving`
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:1967-2306
+# megatron/core/pipeline_parallel/schedules.py
 
 def forward_backward_pipelining_without_interleaving(
     *,
@@ -279,7 +279,7 @@ def forward_backward_pipelining_without_interleaving(
 #### **激活缓存列表**
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2113-2115
+# megatron/core/pipeline_parallel/schedules.py
 
 # Input, output tensors only need to be saved when doing backward passes
 input_tensors = None
@@ -361,7 +361,7 @@ output_grad = send_forward_recv_backward(output)
 **代码实现**：
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2070-2075
+# megatron/core/pipeline_parallel/schedules.py
 
 # Compute number of warmup microbatches.
 num_warmup_microbatches = (
@@ -423,7 +423,7 @@ Stage 0: num_warmup = 8-0-1 = 7 > m=4
 **完整代码**：
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2117-2159
+# megatron/core/pipeline_parallel/schedules.py
 
 # Run warmup forward passes.
 nvtx_range_push(suffix="warmup")  # NVIDIA Tools Extension: profiling标记
@@ -579,7 +579,7 @@ Stage 3:             ←F2
 **完整代码**：
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2160-2238
+# megatron/core/pipeline_parallel/schedules.py
 
 # Before running 1F1B, need to receive first forward tensor.
 if num_microbatches_remaining > 0:
@@ -928,7 +928,7 @@ def enable_grad_sync():
 **完整代码**：
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2242-2290
+# megatron/core/pipeline_parallel/schedules.py
 
 # Run cooldown backward passes.
 nvtx_range_push(suffix="cooldown")
@@ -1059,7 +1059,7 @@ if config.grad_sync_func is not None:
 **典型配置**：
 
 ```python
-# megatron/training.py
+# megatron/training/training.py
 
 def grad_sync_func(parameters):
     """在数据并行组内同步梯度"""
@@ -1510,8 +1510,8 @@ Stage 7: 240 ms/microbatch
 # 方法1: 手动指定
 --pipeline-model-parallel-split-rank 1,3,5,7,9,11,13
 
-# 方法2: Profiling后自动调整
-python tools/profile_pipeline.py \
+# 方法2: Profiling后自动调整（示例脚本名：profile_pipeline.py）
+python profile_pipeline.py \
     --model-config gpt3-175b.yaml \
     --output layer_split.json
 
@@ -1572,7 +1572,7 @@ micro_batch_size 大:
 **自动调优脚本**：
 
 ```python
-# tools/autotune_microbatch.py
+# 示例脚本名：autotune_microbatch.py
 
 def find_optimal_microbatch_size(model_config, memory_limit):
     """二分查找最大可用的micro_batch_size"""
@@ -1884,7 +1884,7 @@ python -m torch.distributed.run \
 **监控与告警**：
 
 ```python
-# megatron_monitor.py
+# training monitor hook
 
 import time
 import torch.distributed as dist
@@ -2067,10 +2067,9 @@ GPipe:
 2021至今: 1F1B成为标准（PyTorch + Megatron时代）
 
 现代LLM训练（2024）:
-- GPT-3, GPT-4: 1F1B (推测)
-- PaLM, PaLM 2: 1F1B
-- LLaMA: 1F1B (Megatron-LM)
-- BLOOM: 1F1B (Megatron-DeepSpeed)
+- 采用Megatron-LM/Megatron-DeepSpeed式流水线并行的训练栈：通常以1F1B作为基线调度
+- BLOOM等公开训练栈：可作为Megatron-DeepSpeed流水线调度案例参考
+- 未公开训练系统（如GPT-4）：不在本文中作为确定调度案例引用
 
 GPipe基本退出生产环境，仅用于研究和教学
 ```
@@ -2441,7 +2440,7 @@ python tools/preprocess_data.py \
     --tokenizer-type GPT2BPETokenizer
 
 # 4. 启动小规模训练（验证）
-bash examples/pretrain_gpt_distributed.sh
+bash examples/gpt3/train_gpt3_175b_distributed.sh
 
 # 关键参数:
 # --pipeline-model-parallel-size 4
@@ -2508,7 +2507,7 @@ metrics = {
 核心文件:
 
 1. 1F1B调度主函数:
-   megatron/core/pipeline_parallel/schedules.py:1967-2306
+   megatron/core/pipeline_parallel/schedules.py
 
 2. P2P通信:
    megatron/core/pipeline_parallel/p2p_communication.py
@@ -2517,7 +2516,7 @@ metrics = {
    megatron/core/pipeline_parallel/utils.py
 
 4. 训练主循环:
-   megatron/training.py
+   megatron/training/training.py
 
 5. 模型定义:
    megatron/core/models/gpt/gpt_model.py

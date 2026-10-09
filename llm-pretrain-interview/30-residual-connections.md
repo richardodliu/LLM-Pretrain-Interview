@@ -2,9 +2,9 @@
 
 > **文档编号**: 30
 > **所属部分**: 第三部分 - Transformer基础架构 (21-30)
-> **代码位置**: `megatron/core/transformer/transformer_layer.py:402-678`
+> **代码位置**: `megatron/core/transformer/transformer_layer.py`
 > **相关代码**: `megatron/core/fusions/fused_bias_dropout.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 
@@ -523,7 +523,7 @@ def TransformerLayer_ReZero(x, attn_mask):
 
 ### 6.2 TransformerLayer._forward_attention()
 
-**代码位置**: `megatron/core/transformer/transformer_layer.py:439-569`
+**代码位置**: `megatron/core/transformer/transformer_layer.py`
 
 ```python
 def _forward_attention(
@@ -607,7 +607,7 @@ def _forward_attention(
 
 ### 6.3 TransformerLayer._forward_mlp()
 
-**代码位置**: `megatron/core/transformer/transformer_layer.py:571-678`
+**代码位置**: `megatron/core/transformer/transformer_layer.py`
 
 ```python
 def _forward_mlp(self, hidden_states, inference_context=None):
@@ -692,7 +692,7 @@ def _forward_mlp(self, hidden_states, inference_context=None):
 
 ### 6.4 Bias-Dropout-Add 融合内核
 
-**代码位置**: `megatron/core/fusions/fused_bias_dropout.py:11-93`
+**代码位置**: `megatron/core/fusions/fused_bias_dropout.py`
 
 ```python
 def _bias_dropout_add_func(x_with_bias, residual, prob, training):
@@ -814,7 +814,7 @@ def get_bias_dropout_add(training, fused):
 
 ### 6.5 单元测试
 
-**测试文件**: `tests/unit_tests/fusions/test_fused_bias_dropout.py` (推测位置)
+**测试文件**: `tests/unit_tests/fusions/test_bias_dropout_fusion.py`
 
 以下是应有的测试用例:
 
@@ -1787,7 +1787,7 @@ $$\frac{\partial y_i}{\partial x_j} = \begin{cases}
 
 **文档完成时间**: 2025-12-27  
 **Megatron-LM 版本**: v0.12.0  
-**代码覆盖率**: ✅ 100%  
+**代码锚点**: ✅ 已标注关键实现参考
 **总行数**: ~1,600 行
 
 **核心贡献**:

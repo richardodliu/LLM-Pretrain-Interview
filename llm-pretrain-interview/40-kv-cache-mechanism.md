@@ -4,7 +4,7 @@
 > **所属部分**: 第四部分 - 高级注意力机制 (31-40)
 > **对应原文档**: 03-attention-mechanisms.md Section 12
 > **代码位置**: `megatron/core/transformer/attention.py`, `megatron/core/inference/inference_request.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: 基于 Megatron-LM 当前仓库的推理注意力路径，并结合 KV Cache serving 论文背景说明
 
 ---
 
@@ -160,31 +160,33 @@ $$
 \begin{aligned}
 \text{KV}_{\text{per\_token}} &= 2 \times 8 \times 128 \times 2 = 4096 \text{ bytes} \\
 \text{KV}_{\text{total}} &= 32 \times 8192 \times 80 \times 4096 = 85,899,345,920 \text{ bytes} \\
-&\approx 10.7 \text{ GB}
+&\approx 85.9 \text{ GB} \; (80.0 \text{ GiB})
 \end{aligned}
 $$
 
+如果使用 TP=8 且 KV 头按 TP rank 均匀切分，每个 rank 的 KV Cache 约为 10.7 GB；这也是工程上更常见的单 GPU 观测口径。
+
 ### 4.4 内存占比分析 (H100 80GB)
 
-| 组件 | 大小 | 占比 |
-|------|------|------|
-| 模型参数 (70B × 2 bytes) | 140 GB | 需要张量并行 (2+ GPU) |
-| KV cache (上述配置) | 10.7 GB | 13.4% (单 GPU) |
-| 激活值 (batch 32) | ~10 GB | 12.5% |
-| **总计** | **~160 GB** | **需要 2 块 H100** |
+| 组件 | 逻辑总量 | 工程解释 |
+|------|----------|----------|
+| 模型参数 (70B × 2 bytes) | 140 GB | 必须跨多 GPU 切分或量化 |
+| KV cache (上述配置) | 85.9 GB | TP=8 时约 10.7 GB/rank |
+| Prefill临时激活 | 取决于batch和kernel | 通常不会像KV一样长期保留 |
+| **结论** | **超过单卡完整承载能力** | 需要TP、PP、cache sharding、paged cache或降低batch/context |
 
-**结论**: KV Cache 是推理的第二大内存消耗,仅次于模型参数。
+**结论**: KV Cache 在长上下文和大 batch decode 中会成为与模型参数同等级别的容量和带宽瓶颈。
 
 ### 4.5 不同架构的 KV Cache 对比
 
-**配置**: $L = 80$, $n_h = 128$, $d_k = 128$, $S = 8K$, $B = 32$, BF16
+**配置**: $L = 80$, $n_h = 128$, $d_k = 128$, $S = 8K$, $B = 32$, BF16。表中为逻辑总量，不含 TP/PP/cache sharding。
 
 | 架构 | KV 头数 $n_g$ | KV Cache (GB) | 相对 MHA |
 |------|--------------|--------------|----------|
-| **MHA** | 128 | 171 | 100% |
-| **GQA-8** | 8 | 10.7 | **6.25%** |
-| **MQA** | 1 | 1.34 | **0.78%** |
-| **MLA** (DeepSeek-V2) | 等效 ~0.4 | 0.6 | **0.35%** |
+| **MHA** | 128 | 1374.4 | 100% |
+| **GQA-8** | 8 | 85.9 | **6.25%** |
+| **MQA** | 1 | 10.7 | **0.78%** |
+| **MLA** (576缓存元素口径) | 特征低秩 | 24.2 | **1.76%** |
 
 ---
 
@@ -192,7 +194,7 @@ $$
 
 ### 5.1 预分配 KV Cache
 
-**文件路径**: `megatron/core/transformer/attention.py:302-312`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 def _allocate_memory(self, inference_max_sequence_length, batch_size, dim, dtype):
@@ -224,7 +226,7 @@ def _allocate_memory(self, inference_max_sequence_length, batch_size, dim, dtype
 
 ### 5.2 KV Cache 管理核心函数
 
-**文件路径**: `megatron/core/transformer/attention.py:327-504`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 def _adjust_key_value_for_inference(
@@ -555,10 +557,10 @@ key, value, block_table = inference_context.key_value_cache(layer_id)
 
 **问题**: 序列长度 $S$ 增加时, KV Cache 内存呈线性增长
 
-**示例**: GPT-4 (推测 1.8T 参数, 128K 上下文)
-- 每 token KV Cache: ~100 KB
-- 128K 上下文: ~12 GB (单层!)
-- 总计 (120 层): ~1.4 TB
+**示例**: 假设一个 120 层、每层每 token 约 100 KB KV Cache 的长上下文 dense decoder
+- 128K 上下文: 约 12 GB/层
+- 全层持久 KV Cache: 约 1.4 TB
+- 这只是容量估算模板，不对应任何未公开模型的已验证配置
 
 **解决方案**:
 - GQA/MLA: 减少 KV 头数或维度
@@ -569,11 +571,11 @@ key, value, block_table = inference_context.key_value_cache(layer_id)
 
 | 上下文长度 | KV Cache (LLaMA-2 70B, batch 32) | 挑战 |
 |-----------|----------------------------------|------|
-| 2K | 2.7 GB | 可接受 |
-| 8K | 10.7 GB | 需要 GQA |
-| 32K | 42.9 GB | 需要 MLA |
-| 128K | 171 GB | 需要多卡 |
-| 1M | 1.3 TB | 基本不可行 |
+| 2K | 21.5 GB | 单卡通常需要更小batch或切分 |
+| 8K | 85.9 GB | 需要TP/cache sharding或降低batch |
+| 32K | 343.6 GB | 需要GQA/MLA/分页调度组合 |
+| 128K | 1.37 TB | 必须多卡切分并控制并发 |
+| 1M | 11.0 TB | 需要稀疏/滑窗/检索等结构性压缩 |
 
 ### 9.3 批次大小的权衡
 
@@ -616,7 +618,21 @@ key, value, block_table = inference_context.key_value_cache(layer_id)
 
 ---
 
-## 参考文献
+## 11. 总结与最佳实践
+
+### 11.1 工程要点
+
+- Prefill计算密集，decode内存带宽密集。
+- KV Cache容量随 batch size、sequence length、layer数和KV head数线性增长。
+- GQA、MLA、PagedAttention和KV量化是降低推理内存压力的主要手段。
+
+### 11.2 常见错误
+
+- position id与缓存位置不一致会破坏RoPE注意力。
+- batch内请求长度差异大时，静态batching会造成明显浪费。
+- 长上下文部署必须同时规划KV Cache显存和请求调度策略。
+
+## 12. 参考文献
 
 1. Kwon et al. (2023). "Efficient Memory Management for Large Language Model Serving with PagedAttention". SOSP.
 2. Ainslie et al. (2023). "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints". EMNLP.
@@ -626,6 +642,170 @@ key, value, block_table = inference_context.key_value_cache(layer_id)
 
 ---
 
+## 附录 A：KV Cache 容量估算模板
+
+通用公式：
+
+$$
+M = B \times S \times L \times E_{\text{kv}} \times b
+$$
+
+其中：
+
+| 符号 | 含义 |
+|------|------|
+| $B$ | 并发请求或batch size |
+| $S$ | 每个请求缓存的token数 |
+| $L$ | decoder层数 |
+| $E_{\text{kv}}$ | 每token每层需要缓存的元素数 |
+| $b$ | 每个元素字节数 |
+
+不同架构的 $E_{\text{kv}}$：
+
+| 架构 | 元素数 |
+|------|--------|
+| MHA | $2n_hd_k$ |
+| GQA | $2n_gd_k$ |
+| MQA | $2d_k$ |
+| MLA | $d_r^{KV}+d_{\text{rope}}$ |
+| INT8 KV | 元素数不变，$b=1$，另有scale开销 |
+| INT4 KV | 元素数不变，$b=0.5$，另有packing/scale开销 |
+
+报告 KV Cache 数值时必须写明：
+
+```text
+batch_size:
+sequence_length:
+num_layers:
+num_kv_heads:
+head_dim:
+dtype:
+logical_total_or_per_gpu:
+tensor_parallel_size:
+cache_quantization:
+paged_cache:
+```
+
+## 附录 B：逻辑总量与每 GPU 口径
+
+KV Cache 估算最常见的误差是混淆逻辑总量和每 GPU 数量。
+
+| 口径 | 含义 | 用途 |
+|------|------|------|
+| 逻辑总量 | 整个模型服务该batch需要的总cache | 容量规划、论文公式 |
+| 每 TP rank | KV按tensor parallel切分后的单卡cache | GPU显存估算 |
+| 每 PP stage | 只负责部分层的cache | pipeline部署 |
+| paged allocated | 实际页分配量 | serving系统峰值 |
+| active tokens | 当前有效token | 调度效率 |
+| reserved capacity | 为未来生成预留 | SLA和并发控制 |
+
+示例：
+
+```text
+logical_kv = 85.9 GB
+tensor_parallel_size = 8
+pipeline_parallel_size = 1
+approx_per_gpu = 10.7 GB
+```
+
+如果 PP=4 且每个 stage 只持有 20 层 cache，则每 stage 的逻辑 cache 还会再按层数降低。但具体服务框架是否这样保存，必须看实现。
+
+## 附录 C：Prefill 与 Decode 资源模型
+
+| 阶段 | 主要输入 | 主要开销 | KV Cache 行为 |
+|------|----------|----------|---------------|
+| Prefill | prompt token | attention计算、临时显存 | 批量写入cache |
+| Decode | 上一步token | 读取历史K/V、采样 | 每步追加少量cache |
+| Chunked prefill | prompt分块 | 计算/调度折中 | 分块写入cache |
+| Speculative decode | draft+verify | 多模型协调 | cache可能回滚 |
+
+优化方向：
+
+- Prefill：FlashAttention、chunking、连续批处理。
+- Decode：GQA/MLA、KV量化、paged cache、batch调度。
+- 长上下文：滑窗、稀疏保留、检索增强、上下文压缩。
+
+## 附录 D：Paged Cache 审查点
+
+Paged Attention 把连续 KV Cache 改成页式管理。审查时关注：
+
+| 项目 | 问题 |
+|------|------|
+| page size | 太小元数据多，太大碎片多 |
+| block table | token到物理页映射是否正确 |
+| eviction | 超长请求是否允许淘汰 |
+| sharing | prefix cache 是否共享 |
+| fragmentation | reserved 与 active 差距 |
+| compaction | 是否需要移动cache |
+| quantization | scale是否按页保存 |
+
+Paged cache 不改变注意力数学，但改变内存布局和调度策略。debug 时要能把逻辑 token position 映射到物理 cache block。
+
+## 附录 E：KV Cache 量化
+
+| 方案 | 理论节省 | 风险 |
+|------|----------|------|
+| FP16/BF16 | baseline | 容量大 |
+| FP8 | 约50% | scale管理和kernel支持 |
+| INT8 | 约50% | 量化误差 |
+| INT4 | 约75% | 质量风险更高 |
+
+注意：如果原始 cache 是 BF16/FP16，INT8 相比原始通常是约 50% 字节节省，不是 75%。INT4 相比原始通常是约 75% 字节节省。还要考虑 scale、zero point、packing 对齐和页元数据。
+
+量化实验应记录：
+
+- calibration 数据。
+- per-tensor/per-channel/per-head scale。
+- prefill 和 decode kernel。
+- short-context 和 long-context 质量。
+- 与 GQA/MLA 是否叠加。
+
+## 附录 F：Serving 调度指标
+
+KV Cache 是 serving 调度的核心资源。建议监控：
+
+| 指标 | 含义 |
+|------|------|
+| active_kv_tokens | 当前实际使用token数 |
+| reserved_kv_tokens | 为请求上限预留token数 |
+| kv_cache_utilization | active/reserved 或 active/capacity |
+| page_fragmentation | 页内浪费比例 |
+| time_to_first_token | prefill体验 |
+| inter_token_latency | decode体验 |
+| max_concurrency | 满足SLA的并发 |
+| eviction_count | cache淘汰次数 |
+| prefix_cache_hit_rate | 前缀复用收益 |
+
+如果只看 GPU memory peak，无法判断问题来自模型参数、临时激活、KV Cache 还是碎片。
+
+## 附录 G：故障排查
+
+| 症状 | 可能原因 | 检查 |
+|------|----------|------|
+| decode 越跑越慢 | cache 读带宽或碎片 | profile memory bandwidth |
+| 长请求 OOM | reserved tokens 过多 | 比较 active/reserved |
+| 输出位置错乱 | cache position 错 | 对比 cache on/off logits |
+| batch调度低效 | 长短请求混排差 | 看page利用率 |
+| GQA后显存未降 | cache保存展开KV | 检查cache tensor shape |
+| 量化后质量差 | scale粒度太粗 | 做per-head scale消融 |
+| prefix cache命中低 | tokenizer或prompt不一致 | 对比prefix hash |
+| chunked prefill不一致 | RoPE offset 错 | 对比一次性prefill |
+
+## 附录 H：上线前检查
+
+1. KV Cache 公式中的 batch、sequence、layer、dtype 已标明。
+2. 数值同时给出逻辑总量和每 GPU 口径。
+3. GQA/MLA/cache量化的收益没有重复计算。
+4. prefill 和 decode 指标分开报告。
+5. RoPE position 与 cache slot 对齐。
+6. paged cache 的 block table 有一致性测试。
+7. 长上下文 OOM 测试覆盖最大并发。
+8. cache on/off 在短序列上 logits 可对齐。
+9. cache 清理、复用、回滚路径有测试。
+10. 文档中没有把公开未验证模型配置写成确定事实。
+
+---
+
 **文档版本**: v1.0
-**最后更新**: 2025-12-27
+**最后更新**: 2026-05-10
 **文档状态**: ✅ 已完成

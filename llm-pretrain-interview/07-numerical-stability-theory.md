@@ -1411,10 +1411,10 @@ class LossScaler:
 
 #### 6.2.3 RMSNorm实现
 
-**文件**: `megatron/core/transformer/rmsnorm.py`
+**文件**: `megatron/core/transformer/torch_norm.py`
 
 ```python
-# 文件: megatron/core/transformer/rmsnorm.py
+# 文件: megatron/core/transformer/torch_norm.py
 
 import torch
 import torch.nn as nn

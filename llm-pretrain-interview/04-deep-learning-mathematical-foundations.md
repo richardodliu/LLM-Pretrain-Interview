@@ -3,7 +3,7 @@
 > **文档编号**: 04
 > **所属部分**: 第一部分 - 数学基础 (01-10)
 > **代码位置**: `megatron/core/` (多个模块)
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 > **前置知识**: 文档 01 (线性代数)、文档 02 (微积分与优化)、文档 03 (概率论与信息论)
 > **后续文档**: 文档 05 (自动微分)、文档 06 (反向传播)、文档 11 (前馈神经网络)
 
@@ -964,7 +964,7 @@ $$
 \frac{\partial \mathcal{L}}{\partial h^{(l)}} = \frac{\partial \mathcal{L}}{\partial h^{(l+1)}} \left(I + \frac{\partial \mathcal{F}}{\partial h^{(l)}}\right)
 $$
 
-即使 $\frac{\partial \mathcal{F}}{\partial h^{(l)}}$ 很小, 仍有恒等映射 $I$ 保证梯度流动。
+即使 $\frac{\partial \mathcal{F}}{\partial h^{(l)}}$ 很小, 恒等映射 $I$ 仍提供一条直接梯度路径，改善梯度传播条件。
 
 **4. Layer Normalization**
 
@@ -2612,7 +2612,7 @@ print(f"Loss: {loss.item():.4f}")  # 应该是有限值, 不是 NaN
 #### C.1 标准 GPT 配置
 
 ```bash
-# examples/gpt3/train_gpt3_175b.sh
+# examples/gpt3/train_gpt3_175b_distributed.sh
 
 #!/bin/bash
 
@@ -2655,6 +2655,6 @@ PP=16
 **文档结束**
 
 **版本**: 1.0
-**最后更新**: 2025-12-28
+**最后更新**: 2026-05-10
 **作者**: 基于 Megatron-LM 实现
 **代码验证**: ✅ 所有代码路径已验证

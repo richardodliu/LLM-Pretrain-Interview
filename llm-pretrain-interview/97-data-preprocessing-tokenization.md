@@ -75,13 +75,13 @@
 > - `megatron/core/datasets/` - 数据集处理
 >
 > **关键文件**:
-> - `megatron/core/tokenizers/megatron_tokenizer.py:1-172` - MegatronTokenizer统一接口
-> - `megatron/core/tokenizers/base_tokenizer.py:1-49` - 抽象基类
-> - `megatron/core/tokenizers/text/libraries/sentencepiece_tokenizer.py:1-412` - SentencePiece实现
-> - `megatron/core/tokenizers/text/libraries/huggingface_tokenizer.py:1-341` - HuggingFace Tokenizer包装
+> - `megatron/core/tokenizers/megatron_tokenizer.py` - MegatronTokenizer统一接口
+> - `megatron/core/tokenizers/base_tokenizer.py` - 抽象基类
+> - `megatron/core/tokenizers/text/libraries/sentencepiece_tokenizer.py` - SentencePiece实现
+> - `megatron/core/tokenizers/text/libraries/huggingface_tokenizer.py` - HuggingFace Tokenizer包装
 > - `megatron/core/tokenizers/text/libraries/tiktoken_tokenizer.py` - TikToken（OpenAI）包装
 > - `megatron/core/datasets/indexed_dataset.py:1-1000` - 索引化数据集
-> - `megatron/core/datasets/gpt_dataset.py:1-900` - GPT数据集处理
+> - `megatron/core/datasets/gpt_dataset.py` - GPT数据集处理
 > - `megatron/core/datasets/megatron_tokenizer.py:1-160` - 数据集级Tokenizer
 
 ---
@@ -1269,7 +1269,7 @@ Output: token_ids: token ID序列
 
 #### 6.1.1 抽象基类
 
-**文件**：`megatron/core/tokenizers/base_tokenizer.py:1-49`
+**文件**：`megatron/core/tokenizers/base_tokenizer.py`
 
 ```python
 from abc import ABC, abstractmethod
@@ -1353,7 +1353,7 @@ class MegatronTokenizerBase(ABC):
 
 #### 6.1.2 工厂模式：MegatronTokenizer
 
-**文件**：`megatron/core/tokenizers/megatron_tokenizer.py:1-172`
+**文件**：`megatron/core/tokenizers/megatron_tokenizer.py`
 
 ```python
 from collections import OrderedDict
@@ -1530,7 +1530,7 @@ def _get_metadata_path(tokenizer_path: str) -> str:
 
 ### 6.2 SentencePiece实现
 
-**文件**：`megatron/core/tokenizers/text/libraries/sentencepiece_tokenizer.py:1-412`
+**文件**：`megatron/core/tokenizers/text/libraries/sentencepiece_tokenizer.py`
 
 ```python
 import sentencepiece
@@ -4427,7 +4427,7 @@ echo "Done!"
 
 ```bash
 #!/bin/bash
-# pretrain_gpt_with_tokenizer.sh
+# pretrain_gpt.py
 # GPT预训练脚本（完整tokenizer配置）
 
 # Tokenizer配置
@@ -4587,11 +4587,11 @@ Embedding参数量 = vocab_size × d_model
 **文档结束**
 
 **版本**: 1.0
-**日期**: 2026-01-01
+**日期**: 2026-05-10
 **作者**: Claude (Anthropic)
 **基于**: Megatron-LM v0.12.0
 
 **相关文档**：
-- 下一篇：[98. 数据加载与索引化](98-data-loading-indexing.md)
-- 上一篇：[96. 数值稳定性实践](96-numerical-stability-practice.md)
+- 下一篇：[98. 数据加载与索引化](98-indexed-dataset-data-loading.md)
+- 上一篇：[96. 数值稳定性实践](96-numerical-stability-practices.md)
 - 返回：[OVERVIEW.md](OVERVIEW.md)

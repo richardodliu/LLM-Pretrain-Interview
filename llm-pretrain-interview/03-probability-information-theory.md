@@ -4,7 +4,7 @@
 > **所属部分**: 第一部分 - 数学基础 (01-10)
 > **前置文档**: 01-线性代数基础, 02-微积分与优化理论
 > **后续文档**: 04-深度学习数学基础
-> **代码覆盖率**: ✅ 100% (基于 PyTorch 和 Megatron-LM 实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (基于 PyTorch 和 Megatron-LM 实际代码)
 
 ---
 
@@ -731,7 +731,7 @@ $$
 **Megatron-LM 实现**:
 
 ```python
-# megatron/core/tensor_parallel/cross_entropy.py:149-199
+# megatron/core/tensor_parallel/cross_entropy.py
 def vocab_parallel_cross_entropy(vocab_parallel_logits, target):
     """
     并行化的交叉熵损失
@@ -1451,7 +1451,7 @@ y_test = dropout(x)           # 推理模式: 不应用 dropout
 **Megatron 中的融合 Dropout**:
 
 ```python
-# megatron/core/transformer/transformer_layer.py:180-220
+# megatron/core/transformer/transformer_layer.py
 class BiasDropoutAddFunction(torch.autograd.Function):
     """
     融合的 Bias + Dropout + Residual Add
@@ -1578,7 +1578,7 @@ def get_init_methods(config):
     return init_method_normal, output_layer_init_method
 
 # 实际应用
-# megatron/core/transformer/attention.py:120-135
+# megatron/core/transformer/attention.py
 class Attention(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -1632,7 +1632,7 @@ $$
 
 #### 6.3.2 并行 Softmax 算法
 
-**文件**: `megatron/core/tensor_parallel/cross_entropy.py:149-250`
+**文件**: `megatron/core/tensor_parallel/cross_entropy.py`
 
 ```python
 def vocab_parallel_cross_entropy(vocab_parallel_logits, target):
@@ -1750,7 +1750,7 @@ $$
 **Megatron-LM 实现**:
 
 ```python
-# pretrain_gpt.py:700-750 (简化)
+# pretrain_gpt.py (简化)
 def evaluate(model, data_iterator):
     """评估模型困惑度"""
     model.eval()

@@ -1,8 +1,8 @@
-# 文档58：注意力层的张量并行
+# 58. 注意力层的张量并行
 
 **版本**: 1.0
 **作者**: LLM预训练研究团队
-**日期**: 2025-12-31
+**日期**: 2026-05-10
 **Megatron-LM 版本**: v0.12.0
 
 ---
@@ -1267,7 +1267,7 @@ $$
 
 #### 7.1.1 QKV投影的初始化
 
-**代码位置**：`megatron/core/transformer/attention.py:1040-1052`
+**代码位置**：`megatron/core/transformer/attention.py`
 
 ```python
 class SelfAttention(Attention):
@@ -1297,7 +1297,7 @@ class SelfAttention(Attention):
 
 #### 7.1.2 输出投影的初始化
 
-**代码位置**：`megatron/core/transformer/attention.py:230-242`（父类Attention）
+**代码位置**：`megatron/core/transformer/attention.py`（父类Attention）
 
 ```python
 class Attention(MegatronModule, ABC):
@@ -1327,7 +1327,7 @@ class Attention(MegatronModule, ABC):
 
 #### 7.2.1 标准MHA流程
 
-**代码位置**：`megatron/core/transformer/attention.py:1145-1232`
+**代码位置**：`megatron/core/transformer/attention.py`
 
 ```python
 def get_query_key_value_tensors(self, hidden_states, key_value_states=None, split_qkv=True):
@@ -1396,7 +1396,7 @@ def get_query_key_value_tensors(self, hidden_states, key_value_states=None, spli
 
 #### 7.3.1 完整前向传播
 
-**代码位置**：`megatron/core/transformer/attention.py:930-990`（简化）
+**代码位置**：`megatron/core/transformer/attention.py`（简化）
 
 ```python
 def forward(self, hidden_states, attention_mask, ...):

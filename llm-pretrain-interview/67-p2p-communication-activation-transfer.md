@@ -704,7 +704,7 @@ def send_forward_recv_forward(
 
 ```python
 # Warmup阶段的overlap示例
-# 文件: megatron/core/pipeline_parallel/schedules.py:1417-1426
+# 文件: megatron/core/pipeline_parallel/schedules.py
 
 if config.overlap_p2p_comm_warmup_flush and not is_pp_first_stage(
     p2p_communicator.pp_group
@@ -996,7 +996,7 @@ class P2PCommunicator:
 ### 9.1 1F1B Warmup阶段
 
 ```python
-# 文件: megatron/core/pipeline_parallel/schedules.py:1359-1367
+# 文件: megatron/core/pipeline_parallel/schedules.py
 
 # Warmup的第一个micro-batch
 input_tensors[0].append(
@@ -1010,7 +1010,7 @@ input_tensors[0].append(
 ### 9.2 1F1B Steady阶段
 
 ```python
-# 文件: megatron/core/pipeline_parallel/schedules.py:1459-1471
+# 文件: megatron/core/pipeline_parallel/schedules.py
 
 if not is_pp_first_stage(p2p_communicator.pp_group):
     input_tensor_grad = None
@@ -1033,7 +1033,7 @@ if not is_pp_first_stage(p2p_communicator.pp_group):
 ### 9.3 With Overlap
 
 ```python
-# 文件: megatron/core/pipeline_parallel/schedules.py:1474-1481
+# 文件: megatron/core/pipeline_parallel/schedules.py
 
 else:
     # Overlap模式：启动P2P通信，但不等待

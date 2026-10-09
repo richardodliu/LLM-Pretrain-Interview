@@ -1699,7 +1699,7 @@ meta_100 = index[100]  # 缓存命中，直接返回
 
 ### 6.3 单元测试
 
-> **测试文件**: `tests/unit_tests/data/test_indexed_dataset.py`（如果存在）
+> **测试文件**: `tests/unit_tests/data/test_bin_reader.py`（如果存在）
 
 **核心测试场景**：
 
@@ -3492,8 +3492,8 @@ $$
 
 **相关文档**：
 - 上一篇：[97. 数据预处理与Tokenization](97-data-preprocessing-tokenization.md)
-- 下一篇：[99. 数据混合与采样策略](99-data-blending-sampling.md)
+- 下一篇：[99. 数据混合与采样策略](99-data-blending-sampling-strategies.md)
 
-**版权声明**：本文档基于Megatron-LM v0.12.0代码分析，遵循Apache 2.0许可证。
+**版权声明**：本文档基于 Megatron-LM v0.12.0代码分析，遵循Apache 2.0许可证。
 
 **© 2025 大语言模型预训练研究著作项目**

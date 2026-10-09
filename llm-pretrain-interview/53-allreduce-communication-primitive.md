@@ -3,13 +3,13 @@
 > **文档编号**: 53
 > **所属部分**: 第六部分 - 数据并行 (51-55)
 > **前置文档**: [51. 数据并行原理与数学推导](51-data-parallelism-fundamentals.md), [52. 分布式数据并行(DDP)详解](52-distributed-data-parallel-detailed.md)
-> **后续文档**: [54. Ring-AllReduce算法详解](54-ring-allreduce-algorithm.md), [55. 梯度同步优化](55-gradient-synchronization-optimization.md)
+> **后续文档**: [54. Ring-AllReduce算法详解](54-ring-allreduce-algorithm-detailed.md), [55. 梯度同步优化](55-gradient-synchronization-bucketing-overlap.md)
 > **代码位置**:
 > - `megatron/core/distributed/param_and_grad_buffer.py:340-472` (DDP AllReduce核心实现)
 > - `megatron/core/parallel_state.py:521-540,1330-1360` (进程组管理)
-> - `megatron/core/tensor_parallel/mappings.py:11-50` (张量并行AllReduce)
+> - `megatron/core/tensor_parallel/mappings.py` (张量并行AllReduce)
 > - `megatron/core/distributed/finalize_model_grads.py:89-484` (特殊场景AllReduce)
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 
@@ -106,10 +106,10 @@ AllReduce的性能直接决定了分布式训练的扩展效率。一个高效�
 **核心实现文件**：
 - **DDP AllReduce核心逻辑**: `megatron/core/distributed/param_and_grad_buffer.py:340-472`
 - **进程组管理**: `megatron/core/parallel_state.py:521-540,1330-1360`
-- **张量并行AllReduce**: `megatron/core/tensor_parallel/mappings.py:11-50`
+- **张量并行AllReduce**: `megatron/core/tensor_parallel/mappings.py`
 - **特殊场景AllReduce**: `megatron/core/distributed/finalize_model_grads.py:89-484`
 - **NCCL集成**: `megatron/core/nccl_allocator.py:1-100`
-- **梯度裁剪AllReduce**: `megatron/core/optimizer/clip_grads.py:50-150`
+- **梯度裁剪AllReduce**: `megatron/core/optimizer/clip_grads.py`
 
 **相关测试文件**：
 - `tests/unit_tests/distributed/test_param_and_grad_buffer.py` - AllReduce单元测试
@@ -1165,7 +1165,7 @@ Group 1: [1, 3]  # TP rank 1, DP rank 0
 
 ### 6.3 张量并行中的AllReduce
 
-**文件**: `megatron/core/tensor_parallel/mappings.py:31-50`
+**文件**: `megatron/core/tensor_parallel/mappings.py`
 
 **g算子：AllReduce梯度** (Line 31-42):
 
@@ -1337,7 +1337,7 @@ def _allreduce_layernorm_grads(model_chunk: List[torch.nn.Module], config):
 
 ### 6.5 梯度范数计算中的AllReduce
 
-**文件**: `megatron/core/optimizer/clip_grads.py:50-150`
+**文件**: `megatron/core/optimizer/clip_grads.py`
 
 **全局梯度范数计算** (需要AllReduce):
 
@@ -2600,15 +2600,15 @@ model.gradient_checkpointing_enable()
 - [文档52: 分布式数据并行(DDP)详解](52-distributed-data-parallel-detailed.md) - AllReduce在DDP中的应用
 
 **后续文档**:
-- [文档54: Ring-AllReduce算法详解](54-ring-allreduce-algorithm.md) - Ring算法的深入分析
-- [文档55: 梯度同步优化](55-gradient-synchronization-optimization.md) - Bucket、重叠等优化技术
+- [文档54: Ring-AllReduce算法详解](54-ring-allreduce-algorithm-detailed.md) - Ring算法的深入分析
+- [文档55: 梯度同步优化](55-gradient-synchronization-bucketing-overlap.md) - Bucket、重叠等优化技术
 
 **相关文档**:
 - [文档56-60: 张量并行](56-tensor-parallelism-theory.md) - 张量并行中的AllReduce
-- [文档68-72: FSDP与ZeRO](68-zero1-optimizer-state-sharding.md) - AllReduce的替代方案(Reduce-Scatter)
+- [文档68-72: FSDP与ZeRO](68-zero-1-optimizer-state-sharding.md) - AllReduce的替代方案(Reduce-Scatter)
 
 **应用文档**:
-- [文档84: Adam优化器详解](84-adam-optimizer.md) - 梯度AllReduce后的优化器更新
+- [文档84: Adam优化器详解](84-adam-optimizer-detailed.md) - 梯度AllReduce后的优化器更新
 - [文档93: 混合精度训练原理](93-mixed-precision-training.md) - FP16梯度AllReduce
 
 ---
@@ -3259,8 +3259,8 @@ $$
 **文档长度**: ~27,000行 Markdown
 
 **下一步**:
-- [文档54: Ring-AllReduce算法详解](54-ring-allreduce-algorithm.md) - Ring算法的详细分析
-- [文档55: 梯度同步优化](55-gradient-synchronization-optimization.md) - Bucket、重叠等优化技术
+- [文档54: Ring-AllReduce算法详解](54-ring-allreduce-algorithm-detailed.md) - Ring算法的详细分析
+- [文档55: 梯度同步优化](55-gradient-synchronization-bucketing-overlap.md) - Bucket、重叠等优化技术
 
 ---
 

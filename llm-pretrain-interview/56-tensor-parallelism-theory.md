@@ -14,13 +14,13 @@
 - [4. 数学原理 (Mathematical Foundations)](#4-数学原理-mathematical-foundations)
 - [5. 算法伪代码 (Pseudocode)](#5-算法伪代码-pseudocode)
 - [6. 代码实现详解 (Implementation)](#6-代码实现详解-implementation)
-- [7. 实验结果 (Experiments)](#7-实验结果-experiments)
-- [8. 消融研究 (Ablation Studies)](#8-消融研究-ablation-studies)
-- [9. 超参数分析 (Hyperparameters)](#9-超参数分析-hyperparameters)
-- [10. 深入探讨 (Advanced Topics)](#10-深入探讨-advanced-topics)
-- [11. 总结 (Conclusion)](#11-总结-conclusion)
-- [12. 参考文献 (References)](#12-参考文献-references)
-- [附录 (Appendices)](#附录-appendices)
+- [7. 实验结果与性能分析](#7-实验结果与性能分析)
+- [8. 消融研究](#8-消融研究)
+- [9. 超参数分析](#9-超参数分析)
+- [10. 深入探讨](#10-深入探讨)
+- [11. 总结与展望](#11-总结与展望)
+- [12. 参考文献](#12-参考文献)
+- [附录](#附录)
 
 ---
 
@@ -1009,7 +1009,7 @@ Output: Y ∈ ℝ^(N×h)            // 输出激活
 
 #### 6.1.1 ColumnParallelLinear 类
 
-**文件路径**: `megatron/core/tensor_parallel/layers.py:745-1073`
+**文件路径**: `megatron/core/tensor_parallel/layers.py`
 
 ```python
 class ColumnParallelLinear(torch.nn.Module):
@@ -1136,7 +1136,7 @@ class ColumnParallelLinear(torch.nn.Module):
 
 #### 6.1.2 ColumnParallelLinear 前向传播
 
-**文件路径**: `megatron/core/tensor_parallel/layers.py:948-1045`
+**文件路径**: `megatron/core/tensor_parallel/layers.py`
 
 ```python
 def forward(
@@ -1227,7 +1227,7 @@ def forward(
 
 这是列并行和行并行都使用的底层前向函数，支持梯度累积融合和异步通信。
 
-**文件路径**: `megatron/core/tensor_parallel/layers.py:437-739`
+**文件路径**: `megatron/core/tensor_parallel/layers.py`
 
 ```python
 class LinearWithGradAccumulationAndAsyncCommunication(torch.autograd.Function):
@@ -1387,7 +1387,7 @@ class LinearWithGradAccumulationAndAsyncCommunication(torch.autograd.Function):
 
 #### 6.1.4 RowParallelLinear 类
 
-**文件路径**: `megatron/core/tensor_parallel/layers.py:1075-1290`
+**文件路径**: `megatron/core/tensor_parallel/layers.py`
 
 ```python
 class RowParallelLinear(torch.nn.Module):
@@ -1483,7 +1483,7 @@ class RowParallelLinear(torch.nn.Module):
 
 #### 6.1.5 RowParallelLinear 前向传播
 
-**文件路径**: `megatron/core/tensor_parallel/layers.py:1232-1280`
+**文件路径**: `megatron/core/tensor_parallel/layers.py`
 
 ```python
 def forward(self, input_):
@@ -1565,7 +1565,7 @@ def forward(self, input_):
 
 #### 6.2.1 f 算子：CopyToModelParallelRegion
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:197-215`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _CopyToModelParallelRegion(torch.autograd.Function):
@@ -1614,7 +1614,7 @@ def copy_to_tensor_model_parallel_region(input_, group=None):
 
 #### 6.2.2 g 算子：ReduceFromModelParallelRegion
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:217-234`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _ReduceFromModelParallelRegion(torch.autograd.Function):
@@ -1663,7 +1663,7 @@ def reduce_from_tensor_model_parallel_region(input_, group=None):
 
 #### 6.2.3 AllReduce 底层实现
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:22-33`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 def _reduce(input_, group):
@@ -1708,7 +1708,7 @@ Ring-AllReduce / Tree-AllReduce (底层算法)
 
 **CPU 初始化**（推荐用于大模型）:
 
-**文件路径**: `megatron/core/tensor_parallel/layers.py:143-186`
+**文件路径**: `megatron/core/tensor_parallel/layers.py`
 
 ```python
 def _initialize_affine_weight_cpu(
@@ -2109,7 +2109,7 @@ $$
 使用 `torch.cuda.memory_summary()` 实测（GPT-13B）：
 
 ```python
-# 代码位置: examples/profile_memory.py
+# 示例文件名: profile_memory.py
 import torch
 from megatron.core import parallel_state
 
@@ -2174,7 +2174,7 @@ $$
 使用NCCL性能测试工具：
 
 ```bash
-# 代码位置: tests/functional_tests/test_scripts/nccl_bench.sh
+# 外部工具示例: nccl-tests/build/all_reduce_perf
 mpirun -np 8 --bind-to none \
   nccl-tests/build/all_reduce_perf \
   -b 8 -e 1G -f 2 -g 1
@@ -2213,7 +2213,7 @@ mpirun -np 8 --bind-to none \
 Megatron使用异步通信实现重叠：
 
 ```python
-# 代码位置: megatron/core/tensor_parallel/layers.py:437-500
+# 代码位置: megatron/core/tensor_parallel/layers.py
 class LinearWithGradAccumulationAndAsyncCommunication(torch.autograd.Function):
     @staticmethod
     def backward(ctx, grad_output):
@@ -2447,7 +2447,7 @@ $$
 
 #### 8.3.1 Attention的并行策略
 
-测试三种QKV切分方式（参见 [4.4节](#44-注意力层的张量并行)）：
+测试三种QKV切分方式（参见 [4.4节](#44-transformer-层的张量并行)）：
 
 | 策略 | 切分维度 | 通信量 | 实现复杂度 |
 |------|---------|--------|-----------|
@@ -2543,7 +2543,7 @@ down = RowParallel(d_ffn, d_model)
 
 #### 8.5.1 不同初始化策略
 
-测试三种权重初始化方法（参见 [6.3.1节](#631-权重初始化)）：
+测试三种权重初始化方法（参见 [6.3.1节](#631-权重初始化策略)）：
 
 **策略1：标准Xavier**
 $$
@@ -2958,7 +2958,7 @@ $$
    - g算子（前向AllReduce）：行并行层之后
 
 3. **数学证明**：
-   参见[定理4.1](#定理41-列并行的正确性)和[定理4.2](#定理42-行并行的正确性)。
+   参见[第4.2节](#42-列并行column-parallelism)和[第4.3节](#43-行并行row-parallelism)。
 
 #### Q2: 为什么TP通常≤8？
 
@@ -3057,7 +3057,7 @@ x_local = ReduceScatter(x_local, dim=0, group=tp_group)  # 反向
 
 **Step 1：验证数学等价性**
 ```python
-# 参见 [6.4节](#64-单元测试与验证)
+# 参见 [6.4节](#64-单元测试)
 # 对比单GPU和TP的输出
 torch.testing.assert_close(output_single, output_parallel, atol=1e-5)
 ```
@@ -3108,7 +3108,7 @@ torch.testing.assert_close(grad_single, grad_tp, rtol=1e-4)
 
 2. **实现**：
 ```python
-# 代码位置: megatron/core/tensor_parallel/layers.py:658-720
+# 代码位置: megatron/core/tensor_parallel/layers.py
 def column_parallel_linear(input, weight, bias, ...):
     # 前向：BF16计算
     output = F.linear(input, weight.t(), bias)  # BF16
@@ -3446,7 +3446,7 @@ state = train_step(state, batch)
    - 工程实践的最佳路径
 
 **致谢**：
-张量并行技术源于NVIDIA Megatron-LM团队的开创性工作（Shoeybi et al., 2019）。本文基于Megatron-LM v0.12.0的实际代码，旨在帮助读者深入理解这一核心技术。
+张量并行技术源于NVIDIA Megatron-LM团队的开创性工作（Shoeybi et al., 2019）。本文基于 Megatron-LM v0.12.0的实际代码，旨在帮助读者深入理解这一核心技术。
 
 **下一步学习**：
 - 文档57：列并行与行并行详解
@@ -3890,7 +3890,7 @@ nvidia-smi dmon -s u
 
 ```bash
 #!/bin/bash
-# 代码位置: examples/train_gpt13b_tp4.sh
+# 示例脚本名: train_gpt13b_tp4.sh
 
 # ===== 环境变量 =====
 export CUDA_DEVICE_MAX_CONNECTIONS=1

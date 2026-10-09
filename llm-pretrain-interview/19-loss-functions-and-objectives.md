@@ -3,7 +3,7 @@
 > **文档编号**: 19
 > **所属部分**: 第二部分 - 深度学习基础 (11-20)
 > **代码位置**: `megatron/core/tensor_parallel/cross_entropy.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 
@@ -564,7 +564,7 @@ def cross_entropy_stable(logits, target):
 
 ### 8.4 Megatron-LM的数值稳定实现
 
-**文件路径**: `megatron/core/tensor_parallel/cross_entropy.py:23-32`
+**文件路径**: `megatron/core/tensor_parallel/cross_entropy.py`
 
 ```python
 @staticmethod
@@ -606,7 +606,7 @@ def calculate_logits_max(vocab_parallel_logits: torch.Tensor):
 
 ### 9.2 VocabParallelCrossEntropy的实现
 
-**文件路径**: `megatron/core/tensor_parallel/cross_entropy.py:16-120`
+**文件路径**: `megatron/core/tensor_parallel/cross_entropy.py`
 
 **核心流程**:
 
@@ -658,7 +658,7 @@ exp_logits.div_(sum_exp_logits.unsqueeze(dim=-1))
 
 ### 9.3 标签平滑的集成
 
-**文件路径**: `megatron/core/tensor_parallel/cross_entropy.py:165-182`
+**文件路径**: `megatron/core/tensor_parallel/cross_entropy.py`
 
 **定义**: 标签平滑是一种正则化技术,将hard one-hot标签软化为柔和分布。
 
@@ -912,7 +912,7 @@ def diagnose_nan_loss(logits, target, vocab_size):
 
 ### 12.3 最佳实践总结
 
-**推荐配置** (基于Megatron-LM和大规模LLM预训练经验):
+**推荐配置** (基于 Megatron-LM和大规模LLM预训练经验):
 
 1. **基础配置**
    ```python
@@ -1229,7 +1229,7 @@ class VocabParallelCELoss:
         # Step 6: 获取目标logit
         target_mask = (target < self.vocab_start) | (target >= self.vocab_end)
         masked_target = target.clone() - self.vocab_start
-        masked_target[target_mask] = 0  # 占位符
+        masked_target[target_mask] = 0  # 安全索引值，后续会用target_mask清零
 
         # 从分片logits中索引
         partition_size = vocab_parallel_logits.size(-1)
@@ -1360,4 +1360,3 @@ loss_config = {
 - [ ] 分布式训练中同步最大值
 - [ ] 标签平滑系数合理: 通常 [0, 0.2]
 - [ ] 梯度不溢出/下溢: 检查梯度范围
-

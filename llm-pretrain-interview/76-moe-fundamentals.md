@@ -1103,7 +1103,7 @@ Output:
 
 #### 6.1.1 Router类 (`router.py:27-150`)
 
-**文件路径**: `megatron/core/transformer/moe/router.py:27-150`
+**文件路径**: `megatron/core/transformer/moe/router.py`
 
 ```python
 class Router(ABC, MegatronModule):
@@ -1221,7 +1221,7 @@ def router_gating_linear(
 
 #### 6.1.2 TopKRouter类 (`router.py:130-600`)
 
-**文件路径**: `megatron/core/transformer/moe/router.py:130-600`
+**文件路径**: `megatron/core/transformer/moe/router.py`
 
 ```python
 class TopKRouter(Router):

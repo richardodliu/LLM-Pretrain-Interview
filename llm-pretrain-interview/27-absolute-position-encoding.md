@@ -3,7 +3,7 @@
 > **文档编号**: 27
 > **所属部分**: 第3部分 - Transformer基础 (21-30)
 > **代码位置**: `megatron/core/models/common/embeddings/language_model_embedding.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 

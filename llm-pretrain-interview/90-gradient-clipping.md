@@ -1,6 +1,6 @@
-# 87. 梯度裁剪 (Gradient Clipping)
+# 90. 梯度裁剪 (Gradient Clipping)
 
-> **代码位置**: `megatron/core/optimizer/clip_grads.py:51-248` (Gradient clipping functions)
+> **代码位置**: `megatron/core/optimizer/clip_grads.py` (Gradient clipping functions)
 > **命令行参数**: `megatron/training/arguments.py:2003-2004` (--clip-grad)
 > **核心论文**: Pascanu et al. (2013), "On the difficulty of training Recurrent Neural Networks", ICML 2013
 
@@ -72,9 +72,9 @@ $$
 - 混合精度训练 (FP16/BF16)
 
 **相关概念**:
-- [文档81: SGD与动量](/llm-pretrain-interview/81-stochastic-gradient-descent-and-momentum.md)
-- [文档84: Adam优化器](/llm-pretrain-interview/84-adam-optimizer-detailed.md)
-- [文档86: 学习率调度](/llm-pretrain-interview/86-learning-rate-scheduling.md)
+- [文档81: SGD与动量](81-stochastic-gradient-descent-and-momentum.md)
+- [文档84: Adam优化器](84-adam-optimizer-detailed.md)
+- [文档86: 学习率调度](86-learning-rate-scheduling.md)
 
 ### 1.3 文档组织
 
@@ -87,7 +87,7 @@ $$
 
 ### 1.4 代码位置
 
-> **核心模块**: `megatron/core/optimizer/clip_grads.py:51-248`
+> **核心模块**: `megatron/core/optimizer/clip_grads.py`
 > **命令行参数**: `megatron/training/arguments.py:2003-2004`
 > **调用位置**: `megatron/core/optimizer/optimizer.py`
 
@@ -564,7 +564,7 @@ return total_norm
 
 #### 6.1.1 `get_grad_norm_fp32()` - 计算梯度范数
 
-**文件路径**: `megatron/core/optimizer/clip_grads.py:51-135`
+**文件路径**: `megatron/core/optimizer/clip_grads.py`
 
 ```python
 def get_grad_norm_fp32(
@@ -676,7 +676,7 @@ def get_grad_norm_fp32(
 
 #### 6.1.2 `clip_grad_by_total_norm_fp32()` - 应用梯度裁剪
 
-**文件路径**: `megatron/core/optimizer/clip_grads.py:138-178`
+**文件路径**: `megatron/core/optimizer/clip_grads.py`
 
 ```python
 def clip_grad_by_total_norm_fp32(
@@ -865,7 +865,7 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
 
 #### 6.2.3 `count_zeros_fp32()` - 梯度稀疏性监控
 
-**文件路径**: `megatron/core/optimizer/clip_grads.py:180-247`
+**文件路径**: `megatron/core/optimizer/clip_grads.py`
 
 ```python
 def count_zeros_fp32(
@@ -925,7 +925,7 @@ if iteration % 100 == 0:
 
 ### 6.3 单元测试
 
-> **测试文件**: `tests/unit_tests/optimizer/test_clip_grads.py` (应存在但Megatron v0.12.0可能未包含)
+> **测试文件**: `tests/unit_tests/test_optimizer.py` (应存在但Megatron v0.12.0可能未包含)
 
 **建议测试用例**:
 
@@ -1042,10 +1042,10 @@ def test_distributed_grad_norm(dist_environment):
 | 5.0 | 发散 | ❌ 低 | <1% | ~8k步发散 |
 
 **结论**:
-- **No clipping**: 训练必然发散（梯度爆炸）
+- **No clipping**: 在该实验设置下训练发散（梯度爆炸）
 - **τ=1.0**: Megatron默认值，平衡稳定性和收敛速度
 - **过小τ**: 过度裁剪，减慢收敛
-- **过大τ**: 无法防止梯度爆炸
+- **过大τ**: 在梯度峰值出现时可能无法抑制梯度爆炸
 
 #### 7.2.2 训练Loss曲线
 
@@ -1175,7 +1175,7 @@ Gradient Norm over Time
 | 3000 | 0.78 | **342.7** 💥 |
 | 3200 | 0.81 | **inf** (发散) |
 
-**结论**: **梯度裁剪是必需的**，去除后训练必然发散。
+**结论**: 在该实验设置下，梯度裁剪对稳定训练是必要保护；去除后出现发散。
 
 #### 8.1.2 不同范数类型的消融
 
@@ -1796,18 +1796,19 @@ $$
 ### 11.5 与其他文档的联系
 
 **前置文档**:
-- [文档81: SGD与动量](/llm-pretrain-interview/81-stochastic-gradient-descent-and-momentum.md) - 优化算法基础
-- [文档84: Adam优化器](/llm-pretrain-interview/84-adam-optimizer-detailed.md) - 梯度裁剪通常与Adam配合
-- [文档86: 学习率调度](/llm-pretrain-interview/86-learning-rate-scheduling.md) - Warmup与裁剪的协同
+- [文档81: SGD与动量](81-stochastic-gradient-descent-and-momentum.md) - 优化算法基础
+- [文档84: Adam优化器](84-adam-optimizer-detailed.md) - 梯度裁剪通常与Adam配合
+- [文档86: 学习率调度](86-learning-rate-scheduling.md) - Warmup与裁剪的协同
 
 **后续文档**:
-- [文档88: 分布式优化器](/llm-pretrain-interview/88-distributed-optimizer.md) - 分布式下的梯度处理
-- [文档89: 优化器状态管理](/llm-pretrain-interview/89-optimizer-state-management.md) - 优化器工程实现
-- [文档93-96: 混合精度训练](/llm-pretrain-interview/) - FP16下的梯度裁剪
+- [文档88: 分布式优化器](88-distributed-optimizer.md) - 分布式下的梯度处理
+- [文档89: 优化器状态管理](89-optimizer-state-management.md) - 优化器工程实现
+- [文档93: 混合精度训练原理](93-mixed-precision-training.md) - FP16下的梯度裁剪入口
+- [文档94: 损失缩放技术](94-loss-scaling-technique.md) - Loss Scaling与裁剪顺序
 
 **相关文档**:
-- [文档61-67: 流水线并行](/llm-pretrain-interview/) - PP下的梯度同步与裁剪
-- [文档68-72: ZeRO与FSDP](/llm-pretrain-interview/) - FSDP下的梯度范数计算
+- [文档61: 流水线并行基础](61-pipeline-parallelism-fundamentals.md) - PP下的梯度同步与裁剪入口
+- [文档68: ZeRO-1优化器状态分片](68-zero-1-optimizer-state-sharding.md) - ZeRO/FSDP下的梯度范数计算入口
 
 ---
 
@@ -2324,8 +2325,8 @@ $$
 ---
 
 **文档版本**: 1.0
-**最后更新**: 2026-01-01
-**作者**: Claude (基于Megatron-LM v0.12.0)
+**最后更新**: 2026-05-10
+**作者**: Claude (基于 Megatron-LM v0.12.0)
 **总字数**: ~18,000字
 **代码行数**: ~2,400行
 

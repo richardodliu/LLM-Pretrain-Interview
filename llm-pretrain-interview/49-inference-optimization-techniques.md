@@ -3,12 +3,12 @@
 > **文档编号**: 49
 > **所属部分**: 第五部分 - 模型架构与优化 (41-50)
 > **代码位置**: `megatron/core/inference/`, `megatron/core/inference/inference_request.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 > **前置知识**: [40. KV Cache机制](40-kv-cache-mechanism.md), [48. 模型量化技术](48-model-quantization-fp8-int8.md)
 
 ---
 
-## 引言
+## 1. 引言
 
 ### 背景
 
@@ -94,7 +94,7 @@ Megatron-LM的推理引擎实现了一套完整的推理优化技术栈，本文
 
 ---
 
-## 相关工作
+## 2. 相关工作
 
 ### 推理优化技术的发展历史
 
@@ -268,7 +268,7 @@ megatron/core/inference/
 
 ---
 
-## 符号定义
+## 3. 符号定义
 
 ### 数学符号表
 
@@ -315,7 +315,7 @@ megatron/core/inference/
 
 ### 代码变量约定
 
-基于Megatron-LM实际代码的变量命名：
+基于 Megatron-LM实际代码的变量命名：
 
 ```python
 # DynamicInferenceContext的核心变量
@@ -402,7 +402,7 @@ $$
 
 ---
 
-## 数学原理
+## 4. 数学原理
 
 ### 推理过程的内存与计算分析
 
@@ -1320,7 +1320,7 @@ $$
 
 ---
 
-## 算法伪代码
+## 5. 算法伪代码
 
 ### 1. DynamicInferenceEngine的主循环
 
@@ -1710,7 +1710,7 @@ context.paused_request_count -= 1
 
 ---
 
-## 代码实现详解
+## 6. 代码实现详解
 
 ### 核心文件概览
 
@@ -2467,7 +2467,7 @@ def append_kv_to_cache(
 
 ---
 
-## 实验结果
+## 7. 实验结果
 
 ### 实验设置
 
@@ -2693,7 +2693,7 @@ Continuous Batching（Megatron-LM）：
 
 ---
 
-## 消融研究
+## 8. 消融研究
 
 ### 各优化技术的独立贡献
 
@@ -2858,7 +2858,7 @@ for decode_count in [1, 2, 4, 8, 16, 32, 64, ..., max_requests]:
 
 ---
 
-## 超参数分析
+## 9. 超参数分析
 
 ### 块大小（Block Size）
 
@@ -3074,7 +3074,7 @@ python examples/inference/gpt/gpt_dynamic_inference.py \
 
 ---
 
-## 深入探讨
+## 10. 深入探讨
 
 ### 推理优化与训练优化的区别
 
@@ -3604,7 +3604,7 @@ def auto_scale(current_qps, target_latency_ms):
 
 ---
 
-## 总结
+## 11. 总结
 
 ### 核心要点回顾
 
@@ -3747,7 +3747,7 @@ def auto_scale(current_qps, target_latency_ms):
 
 ---
 
-## 参考文献
+## 12. 参考文献
 
 ### 核心论文
 
@@ -3835,7 +3835,7 @@ def auto_scale(current_qps, target_latency_ms):
 
 ---
 
-## 附录
+## 13. 附录
 
 ### A. 完整代码示例
 

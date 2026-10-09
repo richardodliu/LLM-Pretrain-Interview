@@ -950,7 +950,7 @@ torch.distributed.all_reduce(
 
 ### 6.3 Reduce-Scatter with FP32 Accumulation
 
-**文件路径**: `megatron/core/distributed/reduce_scatter_with_fp32_accumulation.py:42-93`
+**文件路径**: `megatron/core/distributed/reduce_scatter_with_fp32_accumulation.py`
 
 **函数签名**：
 ```python
@@ -2306,7 +2306,7 @@ $$
 
 **文档版本**: 1.0
 **最后更新**: 2026-01-01
-**作者**: 基于Megatron-LM v0.12.0
+**作者**: 基于 Megatron-LM v0.12.0
 **许可证**: Apache 2.0
 
 **下一文档**: [70. ZeRO-3：参数分片](70-zero-3-parameter-sharding.md)

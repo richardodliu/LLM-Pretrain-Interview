@@ -1987,7 +1987,7 @@ RMSProp对$\alpha$和$\eta$的选择较敏感,而Adam有更稳健的默认值。
 **Megatron的选择**:
 ```python
 # megatron/core/optimizer/optimizer_config.py:85
-optimizer: str = 'adam'  # 默认且唯一推荐
+optimizer: str = 'adam'  # 默认推荐
 ```
 
 **原因**:

@@ -4,7 +4,7 @@
 > **所属部分**: 第三部分 - Transformer基础架构 (21-30)
 > **对应原文档**: 01-megatron-architecture.md
 > **代码位置**: `megatron/core/transformer/transformer_block.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ## 目录
 
@@ -32,7 +32,7 @@ NVIDIA Megatron-LM 是业界领先的大规模 Transformer 模型训练框架，
 **Megatron-LM 的核心价值**：
 1. **极致的训练效率**：通过精心设计的并行策略和性能优化，在多 GPU 集群上实现接近线性的加速比
 2. **模块化的架构设计**：高度解耦的组件使得研究者可以轻松替换或扩展各个模块
-3. **工业级的工程质量**：经过大规模生产环境验证，稳定性和可靠性得到保证
+3. **工业级的工程质量**：经过大规模训练场景验证，具备较成熟的稳定性和可靠性实践
 4. **前沿技术的集成**：快速集成最新的研究成果，如 Flash Attention、新型优化器等
 
 ### 1.2 前置知识
@@ -298,7 +298,7 @@ def get_gpt_layer_with_transformer_engine_spec() -> ModuleSpec:
 
 **通信-计算重叠示例**：
 
-**文件路径**：`megatron/core/distributed/distributed_data_parallel.py:450-520`
+**文件路径**：`megatron/core/distributed/distributed_data_parallel.py`
 
 ```python
 class DistributedDataParallel:
@@ -480,7 +480,7 @@ Megatron-LM 采用清晰的分层架构，每一层都有明确的职责：
 
 **示例**：TransformerLayer 的关注点分离
 
-**文件路径**：`megatron/core/transformer/transformer_layer.py:100-250`
+**文件路径**：`megatron/core/transformer/transformer_layer.py`
 
 ```python
 class TransformerLayer(MegatronModule):
@@ -512,7 +512,7 @@ class TransformerLayer(MegatronModule):
 
 **并行实现**：在子模块中处理
 
-**文件路径**：`megatron/core/tensor_parallel/layers.py:200-350`
+**文件路径**：`megatron/core/tensor_parallel/layers.py`
 
 ```python
 class ColumnParallelLinear(torch.nn.Module):
@@ -741,7 +741,7 @@ megatron/core/models/
 
 #### 5.3.1 GPTModel 类
 
-**文件路径**：`megatron/core/models/gpt/gpt_model.py:39-800`
+**文件路径**：`megatron/core/models/gpt/gpt_model.py`
 
 **类定义**：
 
@@ -1289,7 +1289,7 @@ Output (replicated)
 
 **代码实现**：
 
-**文件路径**：`megatron/core/tensor_parallel/layers.py:200-350`
+**文件路径**：`megatron/core/tensor_parallel/layers.py`
 
 ```python
 class ColumnParallelLinear(torch.nn.Module):
@@ -1394,7 +1394,7 @@ class ColumnParallelLinear(torch.nn.Module):
 
 **通信函数**（自定义 autograd）：
 
-**文件路径**：`megatron/core/tensor_parallel/mappings.py:50-150`
+**文件路径**：`megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _CopyToModelParallelRegion(torch.autograd.Function):
@@ -1460,7 +1460,7 @@ PyTorch 的 autograd 系统会自动处理反向传播，但分布式训练需�
 
 **行并行线性层**：
 
-**文件路径**：`megatron/core/tensor_parallel/layers.py:450-600`
+**文件路径**：`megatron/core/tensor_parallel/layers.py`
 
 ```python
 class RowParallelLinear(torch.nn.Module):
@@ -1569,7 +1569,7 @@ class RowParallelLinear(torch.nn.Module):
 
 **完整示例**：Attention 中的 TP
 
-**文件路径**：`megatron/core/transformer/attention.py:300-500`
+**文件路径**：`megatron/core/transformer/attention.py`
 
 ```python
 class Attention(MegatronModule):
@@ -1670,9 +1670,397 @@ $$
 
 ---
 
-（未完待续，本文档第一部分已经包含了约 15000 字的详细内容。由于篇幅限制，后续章节将在下一个文件中继续...）
+### 5.6 流水线并行 (`pipeline_parallel/`)
 
-继续第5节的其他模块、第6-12节的内容，请告诉我是否需要继续创建剩余部分，或者先创建其他主题文档。
+流水线并行负责把 Transformer 层按层切分到多个 pipeline stage。与张量并行的层内切分不同，流水线并行的核心约束是**激活依赖**：第 $i$ 个 stage 必须等待第 $i-1$ 个 stage 的输出。
+
+Megatron-LM 在 `megatron/core/pipeline_parallel/` 中实现多种调度方式：
+
+- **无流水线**：单 stage 直接执行完整 forward/backward。
+- **1F1B**：warmup 后每个 stage 交替执行一次 forward 和一次 backward，降低激活峰值。
+- **Interleaved 1F1B**：把每个物理 stage 切成多个 virtual stage，减少气泡时间。
+- **P2P通信**：使用 point-to-point send/recv 在相邻 stage 传递 activation 和 gradient。
+
+流水线气泡率近似为：
+
+$$
+\text{Bubble} = \frac{P_p - 1}{M + P_p - 1}
+$$
+
+其中 $P_p$ 是 pipeline parallel size，$M$ 是 micro-batch 数。该公式解释了为什么流水线并行通常需要梯度累积：更多 micro-batch 可以摊薄 warmup 和 cooldown 的空转。
+
+### 5.7 分布式训练 (`distributed/`)
+
+`megatron/core/distributed/` 管理数据并行、梯度 buffer、参数同步和分布式 checkpoint 的基础设施。它和普通 PyTorch DDP 的区别在于：
+
+1. 梯度按 bucket 管理，方便通信-计算重叠。
+2. 参数和梯度可能已经经过 TP/PP/FSDP 切分。
+3. optimizer state 可能由 `DistributedOptimizer` 分片保存。
+
+因此，Megatron-LM 的 DDP 不是一个独立包装器，而是和 tensor parallel、pipeline parallel、optimizer 共享并行状态的系统组件。
+
+### 5.8 优化器与调度器 (`optimizer/`)
+
+`megatron/core/optimizer/` 把训练更新拆成三层：
+
+- **底层优化算法**：AdamW、Adam、SGD。
+- **精度包装器**：FP32 master parameter、FP16/BF16 参数同步、loss scaling。
+- **分布式包装器**：optimizer state 和 main grad buffer 分片。
+
+`megatron/core/optimizer_param_scheduler.py` 独立控制 learning rate 和 weight decay。这样的分层设计保证优化器数学更新、数值精度和分布式状态可以独立演进。
+
+### 5.9 数据与训练入口
+
+训练入口主要位于 `megatron/training/training.py` 和各个 `pretrain_*.py` 脚本。典型控制流为：
+
+```text
+pretrain_gpt.py
+  -> megatron.training.pretrain()
+    -> initialize_megatron()
+    -> setup_model_and_optimizer()
+    -> build_train_valid_test_data_iterators()
+    -> train()
+      -> forward_backward_func()
+      -> optimizer.step()
+      -> scheduler.step()
+      -> checkpoint/log/evaluate
+```
+
+这条链路体现了 Megatron-LM 的核心设计：模型定义在 Megatron Core，训练控制在 `megatron/training`，具体任务脚本只负责提供模型、数据集和 forward step。
+
+---
+
+## 6. 代码组织结构
+
+### 6.1 顶层目录职责
+
+Megatron-LM 的顶层目录可以按职责划分：
+
+| 路径 | 职责 |
+|------|------|
+| `megatron/core/` | 可复用的模型、并行、优化器和分布式训练核心 |
+| `megatron/training/` | 参数解析、训练循环、checkpoint、日志 |
+| `megatron/legacy/` | 旧版实现和兼容路径 |
+| `examples/` | 具体模型和规模配置脚本 |
+| `pretrain_*.py` | 任务入口脚本 |
+| `tests/` | 单元测试和功能测试 |
+
+### 6.2 Core内部依赖方向
+
+推荐理解顺序是自底向上：
+
+1. `parallel_state.py` 定义进程组。
+2. `tensor_parallel/` 定义并行线性层和通信 autograd。
+3. `transformer/` 组合 Attention、MLP、Norm、TransformerLayer。
+4. `models/` 组合 TransformerBlock、Embedding、Output layer。
+5. `optimizer/` 和 `distributed/` 管理训练状态。
+
+依赖方向应尽量从高层调用低层，避免底层模块依赖任务脚本。这样 `GPTModel`、`BertModel`、`T5Model` 可以共享相同 Transformer 核心。
+
+### 6.3 Transformer层级结构
+
+一个 GPT 风格模型的主要层级如下：
+
+```text
+GPTModel
+  Embedding
+  TransformerBlock
+    TransformerLayer[0]
+      input_layernorm
+      SelfAttention
+        ColumnParallelLinear(QKV)
+        DotProductAttention
+        RowParallelLinear(proj)
+      pre_mlp_layernorm
+      MLP or MoELayer
+        ColumnParallelLinear(fc1)
+        activation
+        RowParallelLinear(fc2)
+    TransformerLayer[1..L-1]
+  final_layernorm
+  output_layer
+```
+
+该结构解释了后续文档的拆分方式：文档22-30分别深入注意力、位置编码、LayerNorm、残差连接和FFN。
+
+### 6.4 配置对象与Spec机制
+
+Megatron-Core 使用 `TransformerConfig` 和 module spec 描述模型结构。相比在构造函数里硬编码类，spec机制允许同一个 `TransformerLayer` 在不同模型中替换注意力、MLP、MoE或归一化实现。
+
+这种设计有两个收益：
+
+- **研究灵活性**：可替换局部模块而不重写整体模型。
+- **生产一致性**：不同模型共享训练循环、并行状态和checkpoint路径。
+
+---
+
+## 7. 依赖关系与数据流
+
+### 7.1 Forward数据流
+
+GPT训练的 forward 数据流可以抽象为：
+
+```text
+tokens
+  -> token embedding + position embedding
+  -> hidden_states [S, B, H]
+  -> TransformerBlock
+    -> layernorm
+    -> self-attention
+    -> residual add
+    -> layernorm
+    -> MLP/MoE
+    -> residual add
+  -> final layernorm
+  -> vocab-parallel output logits
+  -> vocab-parallel cross entropy
+```
+
+在 tensor parallel 下，很多张量的最后一维只保存在本地 rank；在 sequence parallel 下，序列维度也可能被切分；在 pipeline parallel 下，只有当前 stage 的层会执行。
+
+### 7.2 Backward数据流
+
+Backward 的关键点是梯度流和通信流交织：
+
+- RowParallelLinear 的 backward 需要对输入梯度做 reduce/scatter。
+- ColumnParallelLinear 的 backward 需要在权重梯度和输入梯度之间选择合适通信。
+- Pipeline stage 之间通过 P2P 发送 activation gradient。
+- DDP 在 bucket ready 后启动 data-parallel 梯度同步。
+
+因此性能优化的核心不是单个 kernel，而是让通信尽可能与后续计算重叠。
+
+### 7.3 Checkpoint数据流
+
+Checkpoint 保存的不只是模型权重，还包括：
+
+- model state dict；
+- optimizer state；
+- scheduler state；
+- RNG state；
+- consumed samples/iterations；
+- distributed checkpoint metadata。
+
+并行配置改变时，checkpoint 是否可恢复取决于保存格式和 optimizer state 的分片方式。使用 DistributedOptimizer 时尤其需要验证 resharding 支持。
+
+### 7.4 错误传播路径
+
+常见错误可以按路径定位：
+
+| 症状 | 首查模块 |
+|------|----------|
+| shape mismatch | `transformer/attention.py`, `tensor_parallel/layers.py` |
+| TP rank结果不一致 | `parallel_state.py`, tensor parallel mapping |
+| PP hang | `pipeline_parallel/p2p_communication.py` |
+| loss NaN | optimizer, mixed precision, attention mask |
+| resume失败 | checkpointing, DistributedOptimizer state |
+
+---
+
+## 8. 配置系统
+
+### 8.1 参数来源
+
+Megatron-LM 的配置来自三类入口：
+
+- CLI 参数：`megatron/training/arguments.py`。
+- YAML 参数：`megatron/training/yaml_arguments.py`。
+- Core配置对象：`TransformerConfig`、`OptimizerConfig`、dataset config 等。
+
+训练启动后，这些参数会被规范化成统一的 `args` 和 config 对象，再传递到模型、优化器和调度器。
+
+### 8.2 配置校验
+
+配置系统需要捕获以下错误：
+
+- `world_size` 不能被 TP/PP/CP/EP 组合整除。
+- `hidden_size` 必须能被 attention head、TP size 等整除。
+- scheduler 不能同时使用 incompatible 的 iter-based 和 sample-based 参数。
+- FP8/FP16/BF16 配置必须和硬件、Transformer Engine 支持一致。
+- MoE expert parallel size 必须和专家数、DP维度兼容。
+
+这些校验通常比运行时错误更重要，因为大规模训练的启动成本很高。
+
+### 8.3 关键配置关系
+
+| 配置 | 影响 |
+|------|------|
+| `tensor_model_parallel_size` | 层内权重切分、attention head分配 |
+| `pipeline_model_parallel_size` | 层间切分、micro-batch调度 |
+| `context_parallel_size` | 长上下文attention通信 |
+| `sequence_parallel` | LayerNorm/Dropout输入切分 |
+| `num_layers`, `hidden_size`, `num_attention_heads` | 模型参数量和计算量 |
+| `micro_batch_size`, `global_batch_size` | 梯度累积与吞吐 |
+| `use_distributed_optimizer` | optimizer state显存与checkpoint语义 |
+
+### 8.4 配置到模块的映射
+
+配置不是只在启动时使用一次，而是贯穿整个模型：
+
+- Attention读取 head、query group、RoPE、mask 和 dropout 配置。
+- MLP读取 FFN hidden size、activation、bias fusion 配置。
+- TransformerLayer读取 layernorm、residual、recompute 配置。
+- Optimizer读取精度、裁剪、weight decay 和分布式状态配置。
+
+这也是为什么 Megatron-LM 文档必须同时讲理论和代码：同一个数学结构在工程中会被多个配置项共同决定。
+
+---
+
+## 9. 进程组管理
+
+### 9.1 多维并行组
+
+Megatron-LM 使用 `parallel_state.py` 管理多维并行组：
+
+- tensor model parallel group；
+- pipeline model parallel group；
+- data parallel group；
+- context parallel group；
+- expert parallel group；
+- embedding group；
+- position embedding group。
+
+每个 rank 同时属于多个正交进程组。某个通信操作使用哪个 group，取决于该张量在哪个维度被切分。
+
+### 9.2 正交分组思想
+
+假设总 rank 组织成多维网格：
+
+$$
+\text{rank} \leftrightarrow (d, p, t, c, e)
+$$
+
+其中 $d,p,t,c,e$ 分别表示 data、pipeline、tensor、context、expert 维度。固定其中某些维度并枚举另一些维度，就得到对应通信组。例如固定 $d,p,c,e$ 而枚举 $t$，得到 tensor parallel group。
+
+### 9.3 通信语义
+
+| 组 | 典型通信 | 用途 |
+|----|----------|------|
+| TP group | all-reduce, all-gather, reduce-scatter | 层内张量切分 |
+| PP group | send/recv | stage间激活传递 |
+| DP group | all-reduce, reduce-scatter | 梯度同步 |
+| CP group | all-gather, reduce-scatter, p2p | 长上下文attention |
+| EP group | all-to-all | MoE token dispatch |
+
+### 9.4 调试建议
+
+多维进程组错误通常表现为 hang 而不是显式异常。排查时应：
+
+1. 打印 rank 到各并行维度的映射。
+2. 确认所有 rank 对通信调用顺序一致。
+3. 先用最小 batch 和短序列复现。
+4. 分别关闭 CP/EP/SP 等高级并行，定位是哪一维引入问题。
+
+---
+
+## 10. 深入探讨
+
+### 10.1 架构设计的核心权衡
+
+Megatron-LM 的架构不是追求最少代码，而是追求可组合的高性能路径。它在以下方面做了明确权衡：
+
+- **性能优先**：接受更复杂的并行状态和配置系统，换取大规模训练效率。
+- **显式配置优先**：让用户指定并行策略，而不是完全依赖自动搜索。
+- **模块化优先**：用 spec 和 config 支持多模型共享核心层。
+- **生产稳定优先**：checkpoint、optimizer、通信重叠和日志都服务于长时间训练。
+
+### 10.2 与其他文档的关系
+
+- 文档22-30展开 Transformer 基础模块。
+- 文档51-80展开并行训练策略。
+- 文档81-92展开优化器与调优。
+- 文档93-100展开混合精度、数据工程和完整训练流程。
+
+本文档的定位是“地图”：帮助读者知道每个具体机制在整体架构中位于哪里。
+
+### 10.3 常见问题与解决方案
+
+| 问题 | 原因 | 解决方向 |
+|------|------|----------|
+| 配置能启动但loss异常 | mask、position id、loss归一化或优化器配置错误 | 先用单卡/TP=1复现 |
+| TP并行shape错误 | hidden/head/FFN维度不能被TP整除 | 检查模型配置整除关系 |
+| PP训练吞吐低 | micro-batch太少或stage不均衡 | 增加梯度累积或重新切层 |
+| 显存高于预期 | activation、optimizer state或checkpoint buffer | 检查 recompute 和 distributed optimizer |
+| checkpoint不可恢复 | 并行配置或optimizer state格式不兼容 | 使用一致配置或支持resharding格式 |
+
+### 10.4 最佳实践
+
+- 先在 TP=1、PP=1 的小配置上验证模型和数据。
+- 再逐步增加 TP、PP、DP，不要一次打开所有并行维度。
+- 每次扩大规模都执行 checkpoint save/load 测试。
+- 对新模型先复用成熟的 TransformerLayer、Attention、MLP spec，再做局部替换。
+- 长时间训练前固定日志字段：loss、lr、grad norm、loss scale、tokens/sec、MFU、memory。
+
+### 10.5 前沿研究方向
+
+未来架构演进主要集中在：
+
+- 自动并行策略搜索；
+- 异构集群上的 rank placement；
+- 更细粒度的通信-计算重叠；
+- FP8/FP4 训练路径；
+- MoE、MLA、SSM 等新结构与现有并行框架的组合。
+
+---
+
+## 11. 总结
+
+### 11.1 核心要点回顾
+
+Megatron-LM 的整体架构围绕一个目标展开：在多维并行环境中高效训练大规模 Transformer。它通过 `parallel_state` 管理进程组，通过 tensor/pipeline/data/context/expert 并行拆分计算和状态，通过模块化 Transformer Core 支撑 GPT、BERT、T5、MoE、Mamba 等模型。
+
+### 11.2 技术优势
+
+- 多维并行能力完整。
+- Transformer 核心模块高度复用。
+- 优化器、混合精度和分布式 checkpoint 与训练循环深度集成。
+- 适合从研究原型扩展到千卡级训练。
+
+### 11.3 局限性
+
+- 配置复杂，错误常常表现为 shape mismatch 或通信 hang。
+- 对新用户不如高层框架易用。
+- 自动并行和自动调参能力有限，需要用户理解硬件和模型结构。
+
+### 11.4 适用场景
+
+Megatron-LM 适合需要手动控制并行策略、追求高吞吐和可复现训练流程的大模型预训练任务。对于小模型或快速原型，使用更简单的训练框架可能成本更低。
+
+### 11.5 与其他文档的联系
+
+读完本文后，建议按以下顺序深入：
+
+1. 文档22-30：掌握单层 Transformer 的组件。
+2. 文档51-80：掌握多维并行。
+3. 文档81-92：掌握优化器和训练稳定性。
+4. 文档93-100：掌握混合精度、数据和完整训练流程。
+
+---
+
+## 12. 参考文献
+
+### 12.1 核心论文
+
+- Vaswani et al. (2017). "Attention Is All You Need". NeurIPS. arXiv:1706.03762.
+- Shoeybi et al. (2019). "Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism". arXiv:1909.08053.
+- Narayanan et al. (2021). "Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM". SC. arXiv:2104.04473.
+- Rajbhandari et al. (2020). "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models". SC. arXiv:1910.02054.
+
+### 12.2 相关论文
+
+- Huang et al. (2019). "GPipe: Efficient Training of Giant Neural Networks using Pipeline Parallelism". NeurIPS.
+- Dao et al. (2022). "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness". NeurIPS.
+- Korthikanti et al. (2022). "Reducing Activation Recomputation in Large Transformer Models". arXiv:2205.05198.
+
+### 12.3 官方文档
+
+- NVIDIA Megatron-LM GitHub repository: https://github.com/NVIDIA/Megatron-LM
+- NVIDIA Megatron Core documentation: https://docs.nvidia.com/megatron-core/developer-guide/latest/
+- PyTorch Distributed documentation: https://pytorch.org/docs/stable/distributed.html
+
+### 12.4 博客与教程
+
+- NVIDIA ADLR Megatron-LM project page: https://research.nvidia.com/labs/adlr/MegatronLM/
+- NVIDIA technical blogs on Megatron and Transformer Engine.
 
 ---
 
@@ -1681,5 +2069,6 @@ $$
 | 版本 | 日期 | 主要更新 | 作者 |
 |------|------|----------|------|
 | 0.1 | 2025-12-27 | 初始版本（第1-5.5节） | Claude |
+| 1.0 | 2026-05-10 | 补齐第5.6节与第6-12节，完成整体架构文档 | Codex |
 
-**文档状态**：🚧 进行中（已完成约 40%）
+**文档状态**：✅ 已完成

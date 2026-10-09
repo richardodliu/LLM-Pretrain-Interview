@@ -1,14 +1,14 @@
 # 大语言模型预训练研究著作：完整知识体系 (100卷)
 
-**版本**: 2.3
+**版本**: 3.0
 
 **类型**: 基于 Megatron-LM v0.12.0 的 LLM 预训练技术知识库
 
 **代码仓库**: /volume/pt-train/users/rbliu/github/LLM-Pretrain-Interview/
 
-**最后更新**: 2025-12-30
+**最后更新**: 2026-05-10
 
-**当前进度**: 55/100 (55%) 详见 [TODO.md](TODO.md)
+**当前进度**: 100/100 (100%) + 2扩展卷，详见 [TODO.md](TODO.md)
 
 **标准文档模板**: 详见 [TEMPLATE.md](TEMPLATE.md)
 
@@ -20,7 +20,7 @@
 
 ## 📚 著作概述
 
-本知识库基于 **NVIDIA Megatron-LM v0.12.0 实际代码仓库**，系统梳理大语言模型预训练的完整知识体系。所有知识点都对应代码仓库中的真实实现，确保理论与实践紧密结合。
+本知识库基于 **NVIDIA Megatron-LM v0.12.0 实际代码仓库**，系统梳理大语言模型预训练的完整知识体系。关键工程知识点尽量锚定代码仓库中的真实实现；数学理论、论文背景和容量估算会在相应文档中单独标明口径，确保理论与实践紧密结合。
 
 ### 代码仓库结构
 
@@ -44,7 +44,7 @@ megatron/
 
 ### 著作特点
 
-1. **代码驱动**：每个知识点都对应 Megatron-LM 代码仓库中的实际实现
+1. **代码驱动**：关键工程知识点对应 Megatron-LM 代码仓库中的实际实现
 2. **数学严谨**：从数学原理出发，推导到工程实现
 3. **生产级别**：基于 NVIDIA 官方生产级代码，而非玩具实现
 4. **面试导向**：涵盖 LLM 预训练技术面试的核心知识点
@@ -109,7 +109,7 @@ megatron/
 - 常见层的反向传播公式
 
 #### 07. 数值稳定性理论
-> **代码位置**: `megatron/core/transformer/dot_product_attention.py:223-245` (Softmax数值稳定)
+> **代码位置**: `megatron/core/transformer/dot_product_attention.py` (Softmax数值稳定)
 - 浮点数的表示误差
 - 条件数与病态问题
 - 数值稳定的算法设计原则
@@ -185,7 +185,7 @@ megatron/
 - 正则化强度的调优
 
 #### 15. 残差连接与梯度流
-> **代码位置**: `megatron/core/transformer/transformer_layer.py:402-452` (残差连接实现)
+> **代码位置**: `megatron/core/transformer/transformer_layer.py` (残差连接实现)
 - 残差连接的数学动机
 - 梯度流分析：残差连接如何解决梯度消失
 - Pre-Activation Residual Block
@@ -253,7 +253,7 @@ megatron/
 
 #### 22. 自注意力机制：数学推导与直觉 ✅
 > **对应文档**: 02-transformer-core.md, 03-attention-mechanisms.md
-> **代码位置**: `megatron/core/transformer/attention.py:1014-1349`
+> **代码位置**: `megatron/core/transformer/attention.py`
 - 自注意力的数学定义
 - Query、Key、Value的几何直觉
 - 注意力权重的计算过程
@@ -273,7 +273,7 @@ megatron/
 
 #### 24. 多头注意力机制(Multi-Head Attention) ✅
 > **对应文档**: 03-attention-mechanisms.md
-> **代码位置**: `megatron/core/transformer/attention.py:1145-1232`
+> **代码位置**: `megatron/core/transformer/attention.py`
 - 多头注意力的数学表达
 - 为什么需要多头：子空间的几何直觉
 - 头的数量与维度的关系
@@ -282,7 +282,7 @@ megatron/
 - MHA的工程实现
 
 #### 25. 注意力掩码技术详解
-> **代码位置**: `megatron/core/transformer/attention.py:350-385` (掩码处理)
+> **代码位置**: `megatron/core/transformer/attention.py` (掩码处理)
 - 因果掩码（Causal Mask）的数学定义
 - Padding掩码的实现
 - 注意力偏置（Attention Bias）
@@ -329,7 +329,7 @@ megatron/
 - 融合LayerNorm的工程优化
 
 #### 30. 残差连接在Transformer中的作用
-> **代码位置**: `megatron/core/transformer/transformer_layer.py:402-452`
+> **代码位置**: `megatron/core/transformer/transformer_layer.py`
 - 残差连接的数学意义回顾
 - Transformer中的两个残差连接
 - 残差路径的缩放：Post-LN的初始化
@@ -372,7 +372,7 @@ megatron/
 - MLA在DeepSeek中的实现
 
 #### 34. Flash Attention v1：IO感知的注意力算法
-> **代码位置**: `megatron/core/transformer/attention.py:570-642` (Flash Attention集成)
+> **代码位置**: `megatron/core/transformer/attention.py` (Flash Attention集成)
 - Attention的IO瓶颈分析
 - Tiling技术：分块计算
 - Online Softmax算法
@@ -437,7 +437,7 @@ megatron/
 ---
 
 ### **第五部分：大语言模型架构详解** (41-50)
-> *主流LLM架构的深度分析（基于Megatron代码仓库）*
+> *主流LLM架构的深度分析（基于 Megatron代码仓库）*
 
 #### 41. GPT架构详解
 > **代码位置**: `megatron/core/models/gpt/gpt_model.py`, `pretrain_gpt.py`
@@ -639,7 +639,7 @@ megatron/
 - Megatron-LM的开创性工作
 
 #### 57. 列并行与行并行详解
-> **代码位置**: `megatron/core/tensor_parallel/layers.py:200-600`
+> **代码位置**: `megatron/core/tensor_parallel/layers.py`
 - 列并行线性层：$Y = XA^T$的切分
 - 行并行线性层：$Y = XB^T$的切分
 - AllReduce的插入位置
@@ -648,7 +648,7 @@ megatron/
 - ColumnParallelLinear的实现原理
 
 #### 58. 注意力层的张量并行
-> **代码位置**: `megatron/core/transformer/attention.py:1569-1638`
+> **代码位置**: `megatron/core/transformer/attention.py`
 - QKV投影的列并行
 - Attention输出的行并行
 - 注意力计算的并行策略
@@ -666,7 +666,7 @@ megatron/
 - 张量并行MLP的实现
 
 #### 60. 词汇表并行(Vocab Parallelism)
-> **代码位置**: `megatron/core/tensor_parallel/layers.py:750-850`
+> **代码位置**: `megatron/core/tensor_parallel/layers.py`
 - 词汇表的切分策略
 - Embedding层的并行
 - Output层的并行
@@ -790,6 +790,14 @@ megatron/
 - 并行配置的搜索空间
 - 混合并行的最佳实践
 
+#### 72.1 混合并行策略实践（扩展卷）⭐
+> **代码位置**: `megatron/core/parallel_state.py`, `examples/gpt3/`, `examples/academic_paper_scripts/`
+- 混合并行配置案例
+- GPU规模、模型规模和micro-batch的联合估算
+- 通信、显存、气泡率的工程权衡
+- 大规模训练配置排障
+- 与文档72的设计理论互补
+
 ---
 
 ### **第十部分：序列并行与上下文并行** (73-75)
@@ -874,7 +882,7 @@ megatron/
 ---
 
 ### **第十二部分：优化器理论与实现** (81-92)
-> *从SGD到现代优化算法（基于Megatron实现）*
+> *从SGD到现代优化算法（基于 Megatron实现）*
 
 #### 81. 随机梯度下降(SGD)与动量
 > **代码位置**: `megatron/core/optimizer/optimizer_config.py:120-145` (SGDOptimizerConfig)
@@ -964,21 +972,23 @@ megatron/
 - 梯度裁剪的数学分析
 - 梯度裁剪的实践建议
 
-#### 91. 优化器调优指南
-- 不同优化器的适用场景
-- 超参数调优策略
-- 学习率搜索方法
-- 优化器性能对比
-- 调优的最佳实践
-- 面试常见问题解析
+#### 91. 混合优化策略
+> **代码位置**: `megatron/core/optimizer/optimizer.py`, `megatron/core/optimizer/grad_scaler.py`, `megatron/core/optimizer_param_scheduler.py`
+- AdamW、学习率调度、梯度裁剪的组合策略
+- FP16/BF16、loss scaling与optimizer step顺序
+- DistributedOptimizer与优化器状态分片
+- 梯度累积、global batch size和LR的交互
+- 训练稳定性诊断表
+- Megatron配置组合模板
 
-#### 92. 优化理论前沿研究
-- 优化landscape分析
-- 逃离鞍点理论
-- 泛化gap分析
-- 隐式正则化
-- 优化器的理论保证
-- 未来研究方向
+#### 92. 优化器选择与调优
+> **代码位置**: `megatron/core/optimizer/__init__.py`, `megatron/core/optimizer/optimizer_config.py`, `megatron/training/arguments.py`
+- AdamW、Adam、SGD、DistributedOptimizer的选择矩阵
+- LR、warmup、betas、weight decay、clip grad调优流程
+- Dense/MoE/长上下文/小模型场景recipes
+- checkpoint resume下的optimizer与scheduler一致性
+- 前沿优化器的引入条件
+- 生产训练上线前检查清单
 
 ---
 
@@ -1013,7 +1023,7 @@ megatron/
 - H100上的FP8性能
 
 #### 96. 数值稳定性实践
-> **代码位置**: `megatron/core/transformer/dot_product_attention.py:223-245` (数值稳定Softmax)
+> **代码位置**: `megatron/core/transformer/dot_product_attention.py` (数值稳定Softmax)
 - Softmax的稳定实现
 - LayerNorm的稳定实现
 - 梯度裁剪的数值考虑
@@ -1045,7 +1055,7 @@ megatron/
 - 高效数据加载的实现
 
 #### 99. 数据混合与采样策略
-> **代码位置**: `megatron/core/datasets/blended_megatron_dataset_*.py`
+> **代码位置**: `megatron/core/datasets/blended_dataset.py`, `megatron/core/datasets/blended_megatron_dataset_config.py`, `megatron/core/datasets/blended_megatron_dataset_builder.py`
 - 多数据源的混合
 - 数据混合比例的确定
 - 采样权重的设计
@@ -1054,7 +1064,7 @@ megatron/
 - 数据混合的工程实践
 
 #### 100. 完整训练流程实战
-> **代码位置**: `pretrain_gpt.py`, `examples/gpt3/train_gpt3_175b.sh`
+> **代码位置**: `pretrain_gpt.py`, `examples/gpt3/train_gpt3_175b_distributed.sh`
 - 训练脚本的完整解析
 - 超参数配置的选择
 - 并行策略的配置
@@ -1180,14 +1190,14 @@ megatron/
 
 ## 🎯 项目定位
 
-本项目是一个**基于Megatron-LM v0.12.0的LLM预训练技术知识库**，旨在：
+本项目是一个**基于 Megatron-LM v0.12.0的LLM预训练技术知识库**，旨在：
 
-1. **代码驱动学习**: 每个知识点都对应实际代码实现
+1. **代码驱动学习**: 关键工程知识点锚定实际代码实现
 2. **系统化知识路径**: 从数学基础到工程实践的完整知识体系
 3. **面试导向**: 每个文档包含常见面试问题与解析
 4. **理论+实践**: 数学推导与工程实现并重
 5. **生产级代码**: 基于NVIDIA官方生产级Megatron-LM
-6. **持续更新**: 跟踪Megatron-LM最新版本和LLM领域进展
+6. **版本完成**: 当前100卷主线已完成，后续更新以勘误、扩展卷和版本同步为主
 
 ---
 
@@ -1197,7 +1207,7 @@ megatron/
 本知识库基于 **Megatron-LM v0.12.0**。所有代码路径和行号基于该版本。如代码库更新，文档中的路径可能需要调整。
 
 ### 知识点验证
-本OVERVIEW.md中规划的100个知识点均已验证在Megatron-LM v0.12.0代码仓库中有对应实现。
+本OVERVIEW.md中规划的100个知识点均已完成；其中关键工程知识点已尽量锚定 Megatron-LM v0.12.0 代码仓库中的对应实现，数学理论、论文背景和容量估算在具体文档中按相应口径说明。
 
 ### 与Megatron代码仓库的关系
 - **代码仓库路径**: `/volume/pt-train/users/rbliu/github/LLM-Pretrain-Interview/`
@@ -1206,5 +1216,5 @@ megatron/
 
 ---
 
-**© 2025 大语言模型预训练研究著作项目**
-**基于 NVIDIA Megatron-LM v0.12.0 - 打造最全面的LLM预训练知识体系** 🚀
+**© 2026 大语言模型预训练研究著作项目**
+**基于 NVIDIA Megatron-LM v0.12.0 - LLM预训练知识体系**

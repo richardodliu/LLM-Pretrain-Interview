@@ -12,7 +12,7 @@
 8. [消融研究](#8-消融研究)
 9. [超参数分析](#9-超参数分析)
 10. [深入探讨](#10-深入探讨)
-11. [总结](#11-总结)
+11. [结论](#11-结论)
 12. [参考文献](#12-参考文献)
 13. [附录](#13-附录)
 
@@ -489,7 +489,7 @@ $$\frac{\partial \mathcal{L}}{\partial \mathbf{S}} = \mathbf{A} \odot \left( \fr
 $$\frac{\partial \mathcal{L}}{\partial \mathbf{Q}} = \frac{1}{\sqrt{d_k}} \frac{\partial \mathcal{L}}{\partial \mathbf{S}} \mathbf{K}$$
 $$\frac{\partial \mathcal{L}}{\partial \mathbf{K}} = \frac{1}{\sqrt{d_k}} \left(\frac{\partial \mathcal{L}}{\partial \mathbf{S}}\right)^T \mathbf{Q}$$
 
-完整的多头注意力反向传播还需要考虑头的拆分和合并，详见附录A.2。
+完整的多头注意力反向传播还应考虑头的拆分和合并，详见附录A.2。
 
 ### 4.4 计算复杂度分析
 

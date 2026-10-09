@@ -3,7 +3,7 @@
 > **文档编号**: 01
 > **所属部分**: 第一部分 - 数学基础 (01-10)
 > **代码位置**: `megatron/core/utils.py`, PyTorch张量操作, Megatron中的应用示例
-> **代码覆盖率**: ✅ 100% (所有内容均基于实际代码实践)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 实际代码实践)
 
 ---
 
@@ -80,7 +80,7 @@
 - **PyTorch张量操作**: PyTorch核心API (`torch.Tensor`, `torch.matmul`, `torch.einsum`)
 - **Megatron工具函数**: `megatron/core/utils.py`
 - **应用示例**:
-  - 注意力机制: `megatron/core/transformer/attention.py:1200-1250` (QKV矩阵乘法)
+  - 注意力机制: `megatron/core/transformer/attention.py` (QKV矩阵乘法)
   - 前馈网络: `megatron/core/transformer/mlp.py:88-183` (线性层矩阵乘法)
   - 层归一化: `megatron/core/transformer/torch_layer_norm.py` (范数计算)
 
@@ -1142,7 +1142,7 @@ result = torch.einsum('ijik->jk', T)  # [4, 6]
 
 #### 6.2.1 注意力机制中的矩阵运算
 
-**文件路径**: `megatron/core/transformer/attention.py:1200-1250`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 # 简化的Megatron Attention实现示例

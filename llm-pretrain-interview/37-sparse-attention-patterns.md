@@ -4,7 +4,7 @@
 > **所属部分**: 第四部分 - 高级注意力机制 (31-40)
 > **对应原文档**: Sparse Transformers (OpenAI, 2019), BigBird (Google, 2020), Longformer (AllenAI, 2020)
 > **代码位置**: `megatron/core/transformer/transformer_config.py:180-187` (滑动窗口配置), `megatron/core/transformer/utils.py:38-45` (滑动窗口掩码), `megatron/core/fusions/fused_softmax.py` (融合掩码Softmax)
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码和相关论文)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码和相关论文)
 
 ---
 
@@ -1099,7 +1099,7 @@ config = TransformerConfig(
 
 #### 6.1.4 DotProductAttention 中的集成
 
-**文件路径**: `megatron/core/transformer/dot_product_attention.py:93-98`
+**文件路径**: `megatron/core/transformer/dot_product_attention.py`
 
 ```python
 class DotProductAttention(MegatronModule):
@@ -2926,7 +2926,7 @@ Q15: ████████████████
 #### B.2 Megatron 配置文件示例
 
 ```python
-# examples/sliding_window_gpt_training.py
+# 示例文件名: sliding_window_gpt_training.py
 """使用滑动窗口注意力训练 GPT 模型"""
 
 from megatron.core.transformer.transformer_config import TransformerConfig

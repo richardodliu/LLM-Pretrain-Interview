@@ -2,8 +2,8 @@
 
 > **文档编号**: 14
 > **所属部分**: 第二部分 - 深度学习基础 (11-20)
-> **代码位置**: `megatron/core/transformer/transformer_config.py:127-131`, `megatron/core/transformer/dot_product_attention.py:114-116`, `megatron/core/optimizer/optimizer_config.py:41-42`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码位置**: `megatron/core/transformer/transformer_config.py:127-131`, `megatron/core/transformer/dot_product_attention.py`, `megatron/core/optimizer/optimizer_config.py:41-42`
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 
@@ -82,10 +82,10 @@
 
 > **核心文件**：
 > - `megatron/core/transformer/transformer_config.py:127-131` - Dropout配置参数
-> - `megatron/core/transformer/dot_product_attention.py:114-116` - 注意力Dropout实现
-> - `megatron/core/transformer/transformer_layer.py:200-350` - TransformerLayer中的Dropout应用
+> - `megatron/core/transformer/dot_product_attention.py` - 注意力Dropout实现
+> - `megatron/core/transformer/transformer_layer.py` - TransformerLayer中的Dropout应用
 > - `megatron/core/optimizer/optimizer_config.py:41-42` - Weight Decay配置
-> - `megatron/core/tensor_parallel/cross_entropy.py:1-200` - 交叉熵损失(Label Smoothing基础)
+> - `megatron/core/tensor_parallel/cross_entropy.py` - 交叉熵损失(Label Smoothing基础)
 
 ---
 
@@ -799,7 +799,7 @@ $$
 \text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{Dropout}(\text{softmax}(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}})) \mathbf{V}
 $$
 
-**代码位置**：`megatron/core/transformer/dot_product_attention.py:114-116`
+**代码位置**：`megatron/core/transformer/dot_product_attention.py`
 
 ```python
 # 注意力概率
@@ -939,7 +939,7 @@ config = TransformerConfig(
 
 ### 8.2 Attention Dropout实现
 
-**文件**：`megatron/core/transformer/dot_product_attention.py:114-220`
+**文件**：`megatron/core/transformer/dot_product_attention.py`
 
 ```python
 class DotProductAttention(MegatronModule):

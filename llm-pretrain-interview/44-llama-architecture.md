@@ -554,7 +554,7 @@ $$
 
 2. **非线性增强**: 相比单一的GELU,双路径设计提供了更丰富的非线性变换
 
-3. **梯度流**: 即使gate接近0,$\text{Swish}'$ 也非零,保证梯度流动
+3. **梯度流**: Swish门控在小输入区域仍保留较平滑的梯度，有助于缓解硬门控带来的梯度截断
 
 **数学推导**:
 
@@ -3285,7 +3285,7 @@ LLaMA系列模型的核心贡献可以总结为**"Efficiency through Simplicity"
 
 ### 11.2 Megatron实现的关键要点
 
-基于Megatron-LM实现LLaMA的关键技术:
+基于 Megatron-LM实现LLaMA的关键技术:
 
 1. **模块化设计**:
    ```python
@@ -3966,25 +3966,25 @@ if __name__ == "__main__":
 
 ### 13.3 模型架构对比表
 
-| Feature | GPT-3 | GPT-4 (推测) | PaLM 540B | LLaMA 1 65B | LLaMA 2 70B | LLaMA 3 70B |
-|---------|-------|--------------|-----------|-------------|-------------|-------------|
-| **Architecture** | Decoder-only | Decoder-only | Decoder-only | Decoder-only | Decoder-only | Decoder-only |
-| **Parameters** | 175B | 1.76T (MoE?) | 540B | 65B | 70B | 70B |
-| **Layers** | 96 | ? | 118 | 80 | 80 | 80 |
-| **Hidden Size** | 12288 | ? | 18432 | 8192 | 8192 | 8192 |
-| **FFN Size** | 49152 (4×) | ? | 49152 (2.67×) | 22016 (2.68×) | 28672 (3.5×) | 28672 (3.5×) |
-| **Heads** | 96 | ? | 48 | 64 | 64 | 64 |
-| **KV Heads** | 96 (MHA) | ? | 1 (MQA) | 64 (MHA) | 8 (GQA) | 8 (GQA) |
-| **Context Length** | 2048 | 32K-128K | 2048 | 2048 | 4096 | 8192 |
-| **Normalization** | LayerNorm | ? | LayerNorm | RMSNorm | RMSNorm | RMSNorm |
-| **Activation** | GELU | ? | SwiGLU | SwiGLU | SwiGLU | SwiGLU |
-| **Position** | Learned | ? | RoPE | RoPE | RoPE | RoPE |
-| **RoPE Base** | - | ? | 10000 | 10000 | 10000 | 500000 |
-| **Bias** | Yes | ? | Yes | No | No | No |
-| **Training Tokens** | 300B | ? | 780B | 1.4T | 2.0T | 15T |
-| **Training Data** | Proprietary | Proprietary | Proprietary | **100% Public** | **100% Public** | **100% Public** |
-| **Open Source** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **Commercial Use** | ❌ | ❌ | ❌ | ❌ | ✅ (with conditions) | ✅ |
+| Feature | GPT-3 | PaLM 540B | LLaMA 1 65B | LLaMA 2 70B | LLaMA 3 70B |
+|---------|-------|-----------|-------------|-------------|-------------|
+| **Architecture** | Decoder-only | Decoder-only | Decoder-only | Decoder-only | Decoder-only |
+| **Parameters** | 175B | 540B | 65B | 70B | 70B |
+| **Layers** | 96 | 118 | 80 | 80 | 80 |
+| **Hidden Size** | 12288 | 18432 | 8192 | 8192 | 8192 |
+| **FFN Size** | 49152 (4×) | 49152 (2.67×) | 22016 (2.68×) | 28672 (3.5×) | 28672 (3.5×) |
+| **Heads** | 96 | 48 | 64 | 64 | 64 |
+| **KV Heads** | 96 (MHA) | 1 (MQA) | 64 (MHA) | 8 (GQA) | 8 (GQA) |
+| **Context Length** | 2048 | 2048 | 2048 | 4096 | 8192 |
+| **Normalization** | LayerNorm | LayerNorm | RMSNorm | RMSNorm | RMSNorm |
+| **Activation** | GELU | SwiGLU | SwiGLU | SwiGLU | SwiGLU |
+| **Position** | Learned | RoPE | RoPE | RoPE | RoPE |
+| **RoPE Base** | - | 10000 | 10000 | 10000 | 500000 |
+| **Bias** | Yes | Yes | No | No | No |
+| **Training Tokens** | 300B | 780B | 1.4T | 2.0T | 15T |
+| **Training Data** | Proprietary | Proprietary | Publicly described mix | Publicly described mix | Publicly described mix |
+| **Open Source** | No | No | Weights released | Weights released | Weights released |
+| **Commercial Use** | No | No | Restricted | Conditional license | Conditional license |
 
 ### 13.4 Megatron训练性能Checklist
 

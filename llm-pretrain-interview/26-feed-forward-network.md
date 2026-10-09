@@ -3,7 +3,7 @@
 > **文档编号**: 26
 > **所属部分**: 第3部分 - Transformer基础 (21-30)
 > **代码位置**: `megatron/core/transformer/mlp.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 
@@ -2226,7 +2226,7 @@ python pretrain_gpt.py \
 ---
 
 **文档版本**: v1.0
-**最后更新**: 2025-12-27
+**最后更新**: 2026-05-10
 **作者**: Claude (Anthropic)
 **审阅状态**: ✅ 已完成
 
@@ -2238,4 +2238,4 @@ python pretrain_gpt.py \
 - [文档 29: 层归一化详解](29-layernorm.md)
 - [文档 30: 残差连接在 Transformer 中的作用](30-residual-connections.md)
 - [文档 56-60: 张量并行理论与实现](56-tensor-parallelism-theory.md)
-- [文档 76-80: 混合专家(MoE)架构](76-moe-architecture.md)
+- [文档 76-80: 混合专家(MoE)架构](76-moe-fundamentals.md)

@@ -649,7 +649,7 @@ G_PF = (1/m) Σ_{j=1}^{m} ∇L_j(micro_batch_j; w)
 
 Megatron-LM实现了PipeDream-Flush（同步1F1B），位于：
 ```
-megatron/core/pipeline_parallel/schedules.py:1967-2306
+megatron/core/pipeline_parallel/schedules.py
 ```
 
 **核心函数**：`forward_backward_pipelining_without_interleaving`
@@ -686,7 +686,7 @@ def forward_backward_pipelining_without_interleaving(
 #### **Warmup阶段实现**
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2070-2095
+# megatron/core/pipeline_parallel/schedules.py
 
 # Compute number of warmup microbatches.
 num_warmup_microbatches = (
@@ -751,7 +751,7 @@ nvtx_range_pop(suffix="warmup")
 #### **Steady阶段（1F1B核心）**
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2160-2240
+# megatron/core/pipeline_parallel/schedules.py
 
 # Before running 1F1B, need to receive first forward tensor.
 if num_microbatches_remaining > 0:
@@ -871,7 +871,7 @@ for i in range(num_microbatches_remaining):
 #### **Cooldown阶段实现**
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2242-2290
+# megatron/core/pipeline_parallel/schedules.py
 
 # Run cooldown backward passes.
 nvtx_range_push(suffix="cooldown")
@@ -1011,7 +1011,7 @@ input_tensor_grad = backward_step(...)
 Megatron还实现了虚拟流水线（Interleaved）版本的1F1B：
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:827-1956
+# megatron/core/pipeline_parallel/schedules.py
 
 def forward_backward_pipelining_with_interleaving(...):
     """Run interleaved 1F1B schedule (model split into model chunks), with
@@ -1445,7 +1445,7 @@ w_{t+1} = w_t - η × G_flush = w_t - η × G_sync
 **实际选择**：
 
 几乎所有生产系统选择PipeDream-Flush，原因：
-1. **收敛保证**：与数据并行完全等价，无需调试收敛问题
+1. **收敛行为更接近同步训练**：避免权重版本滞后带来的主要收敛风险，但仍需监控学习率、batch和数值稳定性
 2. **内存优势**：无需额外的(p-1)×权重内存
 3. **实现简单**：无需复杂的版本管理
 4. **性能差距小**：吞吐量只低2-3%，可以接受
@@ -2047,7 +2047,7 @@ Pipeline stage间通信通常跨节点:
 
 ### 11.1 配置选择
 
-**推荐配置（基于Megatron-LM经验）**：
+**推荐配置（基于 Megatron-LM经验）**：
 
 ```python
 # GPT-3 175B配置
@@ -2333,7 +2333,7 @@ python tools/preprocess_data.py \
     --tokenizer-type GPT2BPETokenizer
 
 # 3. 启动训练（1F1B）
-bash examples/pretrain_gpt_distributed.sh
+bash examples/gpt3/train_gpt3_175b_distributed.sh
 
 # 关键参数:
 # --pipeline-model-parallel-size 4  # PP=4
@@ -2377,11 +2377,11 @@ bash examples/pretrain_gpt_distributed.sh
 核心文件位置:
 
 1. 1F1B调度实现:
-   megatron/core/pipeline_parallel/schedules.py:1967-2306
+   megatron/core/pipeline_parallel/schedules.py
    - forward_backward_pipelining_without_interleaving
 
 2. 虚拟流水线1F1B:
-   megatron/core/pipeline_parallel/schedules.py:827-1956
+   megatron/core/pipeline_parallel/schedules.py
    - forward_backward_pipelining_with_interleaving
 
 3. P2P通信:
@@ -2553,7 +2553,7 @@ PipeDream-Flush:     1536 + 2048 + 6144 = 9728 MB  ← 最优
 ### C.1 Warmup阶段代码详解
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2070-2095
+# megatron/core/pipeline_parallel/schedules.py
 
 # 计算Warmup阶段需要执行的前向次数
 # 公式: p - rank - 1
@@ -2620,7 +2620,7 @@ nvtx_range_pop(suffix="warmup")
 ### C.2 Steady阶段（1F1B）代码详解
 
 ```python
-# megatron/core/pipeline_parallel/schedules.py:2160-2240
+# megatron/core/pipeline_parallel/schedules.py
 
 # 在开始1F1B之前，需要接收第一个前向输入
 # （因为1F1B是先前向，再反向，需要输入ready）

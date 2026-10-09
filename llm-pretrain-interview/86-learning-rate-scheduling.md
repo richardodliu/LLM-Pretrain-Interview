@@ -1,6 +1,6 @@
 # 86. 学习率调度策略详解
 
-> **代码位置**: `megatron/core/optimizer_param_scheduler.py:1-312`
+> **代码位置**: `megatron/core/optimizer_param_scheduler.py`
 > **测试文件**: `tests/unit_tests/test_optimizer_param_scheduler.py`
 > **实际应用**: `examples/gpt3/train_gpt3_175b_distributed.sh:49` (cosine调度)
 > **论文**: Loshchilov & Hutter (2017), "SGDR: Stochastic Gradient Descent with Warm Restarts", ICLR 2017
@@ -1124,7 +1124,7 @@ $$
 
 ### 6.1 OptimizerParamScheduler类结构
 
-**文件位置**: `megatron/core/optimizer_param_scheduler.py:14-312`
+**文件位置**: `megatron/core/optimizer_param_scheduler.py`
 
 **类定义**：
 
@@ -2595,7 +2595,7 @@ $$
 
 ### 10.4 学习率调度 vs 自适应优化器
 
-**核心问题**：既然Adam有自适应学习率，为什么还需要学习率调度？
+**核心问题**：既然Adam有自适应学习率，为什么仍然需要学习率调度？
 
 #### 10.4.1 Adam的自适应机制
 
@@ -3392,7 +3392,7 @@ $$
 
 3. **代码位置**：
 
-   - 核心实现：`megatron/core/optimizer_param_scheduler.py:14-312`
+   - 核心实现：`megatron/core/optimizer_param_scheduler.py`
    - 单元测试：`tests/unit_tests/test_optimizer_param_scheduler.py`
 
 ### 13.2 技术优势
@@ -3690,7 +3690,7 @@ $$
 f(r) = 1 - \sqrt{r}
 $$
 
-### B.3 代码实现 (megatron/core/optimizer_param_scheduler.py:176-191)
+### B.3 代码实现 (megatron/core/optimizer_param_scheduler.py)
 
 ```python
 elif self.lr_decay_style == 'WSD':
@@ -3839,5 +3839,5 @@ $$
 **文档完成** ✅
 
 **版本**: 1.0
-**作者**: Claude (基于Megatron-LM v0.12.0)
-**最后更新**: 2026-01-01
+**作者**: Claude (基于 Megatron-LM v0.12.0)
+**最后更新**: 2026-05-10

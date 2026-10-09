@@ -3,7 +3,7 @@
 > **文档编号**: 43
 > **所属部分**: 第五部分 - 大语言模型架构详解 (41-50)
 > **代码位置**: `megatron/core/models/T5/t5_model.py`, `pretrain_t5.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 
@@ -2424,4 +2424,4 @@ def t5_forward(encoder_input_ids, decoder_input_ids):
 **文档完成**: 2025-12-28
 **版本**: v1.0
 **字数**: ~3,200行
-**覆盖率**: ✅ 100% 基于Megatron-LM实际代码
+**覆盖率**: ✅ 100% 基于 Megatron-LM实际代码

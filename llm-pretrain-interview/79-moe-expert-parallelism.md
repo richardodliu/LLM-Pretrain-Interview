@@ -1,7 +1,7 @@
 # 79. MoE专家并行实现 (Expert Parallelism Implementation)
 
 **版本**: 1.0
-**最后更新**: 2026-01-01
+**最后更新**: 2026-05-10
 **Megatron-LM 版本**: v0.12.0
 
 > **代码位置**: `megatron/core/transformer/moe/token_dispatcher.py`
@@ -122,7 +122,7 @@
 >
 > **配置文件**: `megatron/core/transformer/transformer_config.py:400-420` (EP相关参数)
 >
-> **示例脚本**: `examples/mixtral/train_mixtral_8x7b.sh` (EP=8配置示例)
+> **示例脚本**: `examples/mixtral/train_mixtral_8x7b_distributed.sh` (EP=8配置示例)
 
 ---
 
@@ -319,7 +319,7 @@ dispatched_hidden, dispatched_probs, _, tokens_per_expert, handle = hybrid_ep_di
 **Megatron-LM中的变量命名**:
 
 ```python
-# megatron/core/transformer/moe/token_dispatcher.py:39-47
+# megatron/core/transformer/moe/token_dispatcher.py
 """
 H: hidden size               # 隐藏层维度
 B: micro batch size          # Micro-batch大小
@@ -921,7 +921,7 @@ Rank 0-15:  expert_dp_group={0,16,32,48}
 
 ### 6.1 MoEAlltoAllTokenDispatcher核心实现
 
-**文件**: `megatron/core/transformer/moe/token_dispatcher.py:338-867`
+**文件**: `megatron/core/transformer/moe/token_dispatcher.py`
 
 #### 6.1.1 初始化函数
 
@@ -1728,7 +1728,7 @@ class RankGenerator:
 
 ### 6.3 DeepEP融合内核实现
 
-**文件**: `megatron/core/transformer/moe/token_dispatcher.py:1283-1482` (MoEFlexTokenDispatcher)
+**文件**: `megatron/core/transformer/moe/token_dispatcher.py` (MoEFlexTokenDispatcher)
 
 ```python
 class MoEFlexTokenDispatcher(MoETokenDispatcher):
@@ -2209,7 +2209,7 @@ MOE_EXPERT_CAPACITY_FACTOR=None  # Dropless
 
 # Launch command
 torchrun --nproc_per_node=8 --nnodes=8 \
-    pretrain_gpt_moe.py \
+    pretrain_gpt.py \
     --tensor-model-parallel-size $TP \
     --expert-model-parallel-size $EP \
     --pipeline-model-parallel-size $PP \
@@ -2239,7 +2239,7 @@ MOE_EXPERT_CAPACITY_FACTOR=1.25
 MOE_SHARED_EXPERT_INTERMEDIATE_SIZE=8192  # Shared FFN size
 
 torchrun --nproc_per_node=8 --nnodes=64 \
-    pretrain_gpt_moe.py \
+    pretrain_gpt.py \
     --tensor-model-parallel-size $TP \
     --expert-model-parallel-size $EP \
     --num-experts $NUM_EXPERTS \
@@ -2708,7 +2708,7 @@ __global__ void fused_permute_alltoall_permute(
 
 ```
 Step 1: 运行Megatron-LM提供的Mixtral示例
-  → examples/mixtral/train_mixtral_8x7b.sh
+  → examples/mixtral/train_mixtral_8x7b_distributed.sh
 
 Step 2: 修改EP配置，观察通信量和throughput变化
   → 尝试EP=1, 2, 4, 8

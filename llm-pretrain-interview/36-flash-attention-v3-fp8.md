@@ -3,8 +3,8 @@
 > **文档编号**: 36
 > **所属部分**: 第四部分 - 高级注意力机制 (31-40)
 > **对应原文档**: Flash Attention v3 (Dao et al., 2024), Transformer Engine FP8
-> **代码位置**: `megatron/core/transformer/attention.py:53-72, 597-634`, `megatron/core/fp8_utils.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码位置**: `megatron/core/transformer/attention.py, 597-634`, `megatron/core/fp8_utils.py`
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 
@@ -173,8 +173,8 @@ v3 流水线：
 ### 1.4 代码位置
 
 > **主要文件**:
-> - Flash Attention v3 导入: `megatron/core/transformer/attention.py:53-72`
-> - Flash Attention v3 使用: `megatron/core/transformer/attention.py:597-634, 682-697`
+> - Flash Attention v3 导入: `megatron/core/transformer/attention.py`
+> - Flash Attention v3 使用: `megatron/core/transformer/attention.py, 682-697`
 > - FP8 工具函数: `megatron/core/fp8_utils.py`
 > - Transformer Engine 集成: `megatron/core/extensions/transformer_engine.py:66-249`
 >
@@ -525,7 +525,7 @@ class Fp8Recipe(Enum):
 #### Flash Attention v3 参数
 
 ```python
-# megatron/core/transformer/attention.py:600-634
+# megatron/core/transformer/attention.py
 output_total, *unused = _flash_attn_forward(
     q=q,                         # [total_q, num_heads, head_dim] (可以是 FP8)
     k=k,                         # [total_k, num_heads, head_dim]
@@ -1054,7 +1054,7 @@ Output: dQ, dK, dV ∈ ℝ^(B×H×N×d)   # 输入梯度 (BF16)
 
 #### 6.1.1 Flash Attention v3 导入与检测
 
-**文件路径**: `megatron/core/transformer/attention.py:53-72`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 # 优先尝试 flash_attn_3 (官方 v3 实现)
@@ -1100,7 +1100,7 @@ def get_flash_attn_version():
 
 #### 6.1.2 Flash Attention v3 前向计算
 
-**文件路径**: `megatron/core/transformer/attention.py:597-634`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 # 训练模式 (max_seqlen_q > 1)
@@ -1261,7 +1261,7 @@ with _get_fp8_autocast_for_quant_params(self.te_quant_params, self.training):
 
 #### 6.1.4 FP8 张量工具函数
 
-**文件路径**: `megatron/core/fp8_utils.py:95-118`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 ```python
 def is_float8tensor(tensor: torch.Tensor) -> bool:
@@ -1306,7 +1306,7 @@ if is_float8tensor(q):
 
 #### 6.1.5 FP8 对齐要求
 
-**文件路径**: `megatron/core/fp8_utils.py:167-173`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 ```python
 def get_fp8_align_size(fp8_recipe: Fp8Recipe) -> int:
@@ -1447,7 +1447,7 @@ class DelayedScaling:
 
 ### 6.3 单元测试
 
-**测试文件**: `tests/unit_tests/transformer/test_flash_attn.py` (假设)
+**测试文件**: `tests/unit_tests/transformer/test_attention.py` (假设)
 
 ```python
 def test_flash_attention_v3_fp8():
@@ -2904,6 +2904,6 @@ $$
 Flash Attention v3 + FP8 代表了 LLM 训练和推理的**最前沿技术**，是 H100/H200 GPU 上的**最优解**。掌握 v3 和 FP8 的原理与实践，对于高效训练和部署大规模模型至关重要。
 
 **下一步学习**：
-- [文档 37: 稀疏注意力模式](./37-sparse-attention.md)
-- [文档 48: 模型量化技术详解](./48-model-quantization.md)
+- [文档 37: 稀疏注意力模式](./37-sparse-attention-patterns.md)
+- [文档 48: 模型量化技术详解](./48-model-quantization-fp8-int8.md)
 - [文档 31: GQA - 与 Flash Attention v3 的黄金组合](./31-grouped-query-attention.md)

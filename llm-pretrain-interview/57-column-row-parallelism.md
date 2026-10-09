@@ -3,7 +3,7 @@
 > **文档编号**: 57/100
 > **层级**: 第七部分 - 张量并行 (Tensor Parallelism)
 > **作者**: LLM预训练研究团队
-> **日期**: 2025-12-31
+> **日期**: 2026-05-10
 > **版本**: v1.0
 > **代码版本**: Megatron-LM v0.12.0
 > **参考文档**: [文档56: 张量并行的数学原理](56-tensor-parallelism-theory.md)
@@ -17,7 +17,7 @@
 | **主题** | 列并行与行并行的详细实现 |
 | **难度** | ⭐⭐⭐⭐ (高级) |
 | **前置知识** | 张量并行理论、线性代数、分布式训练 |
-| **代码位置** | `megatron/core/tensor_parallel/layers.py:745-1316` |
+| **代码位置** | `megatron/core/tensor_parallel/layers.py` |
 | **核心类** | `ColumnParallelLinear`, `RowParallelLinear` |
 | **核心算子** | `_CopyToModelParallelRegion`, `_ReduceFromModelParallelRegion` |
 | **预计阅读时间** | 60分钟 |
@@ -32,7 +32,7 @@
 4. [列并行详解](#4-列并行详解)
 5. [行并行详解](#5-行并行详解)
 6. [Megatron-LM代码实现](#6-megatron-lm代码实现)
-7. [实验结果与性能分析](#7-实验结果与性能分析)
+7. [实验结果与分析（精简版）](#7-实验结果与分析精简版)
 8. [消融研究](#8-消融研究)
 9. [超参数分析](#9-超参数分析)
 10. [深入探讨](#10-深入探讨)
@@ -1730,12 +1730,12 @@ class ParallelMLP(nn.Module):
 
 ### 6.1 ColumnParallelLinear类详解
 
-**代码位置**：`megatron/core/tensor_parallel/layers.py:745-1073`
+**代码位置**：`megatron/core/tensor_parallel/layers.py`
 
 #### 6.1.1 __init__方法分析
 
 ```python
-# 文件：megatron/core/tensor_parallel/layers.py:794-940
+# 文件：megatron/core/tensor_parallel/layers.py
 class ColumnParallelLinear(torch.nn.Module):
     def __init__(
         self,
@@ -1825,7 +1825,7 @@ class ColumnParallelLinear(torch.nn.Module):
 #### 6.1.2 forward方法分析
 
 ```python
-# 文件：megatron/core/tensor_parallel/layers.py:948-1045
+# 文件：megatron/core/tensor_parallel/layers.py
 def forward(
     self,
     input_: torch.Tensor,
@@ -1903,7 +1903,7 @@ def forward(
 #### 6.1.3 _forward_impl方法
 
 ```python
-# 文件：megatron/core/tensor_parallel/layers.py:942-946
+# 文件：megatron/core/tensor_parallel/layers.py
 def _forward_impl(self, input, weight, *args, **kwargs):
     if not weight.requires_grad:
         return linear_with_frozen_weight(input, weight, *args, **kwargs)
@@ -1915,12 +1915,12 @@ def _forward_impl(self, input, weight, *args, **kwargs):
 
 ### 6.2 RowParallelLinear类详解
 
-**代码位置**：`megatron/core/tensor_parallel/layers.py:1075-1316`
+**代码位置**：`megatron/core/tensor_parallel/layers.py`
 
 #### 6.2.1 __init__方法分析
 
 ```python
-# 文件：megatron/core/tensor_parallel/layers.py:1111-1224
+# 文件：megatron/core/tensor_parallel/layers.py
 class RowParallelLinear(torch.nn.Module):
     def __init__(
         self,
@@ -2000,7 +2000,7 @@ class RowParallelLinear(torch.nn.Module):
 #### 6.2.2 forward方法分析
 
 ```python
-# 文件：megatron/core/tensor_parallel/layers.py:1232-1288
+# 文件：megatron/core/tensor_parallel/layers.py
 def forward(self, input_):
     """
     输入：
@@ -2074,7 +2074,7 @@ def forward(self, input_):
 #### 6.3.1 g算子（CopyToModelParallelRegion）
 
 ```python
-# 文件：megatron/core/tensor_parallel/mappings.py:197-214
+# 文件：megatron/core/tensor_parallel/mappings.py
 class _CopyToModelParallelRegion(torch.autograd.Function):
     """Pass the input to the model parallel region."""
 
@@ -2098,7 +2098,7 @@ def copy_to_tensor_model_parallel_region(input_, group):
 #### 6.3.2 f算子（ReduceFromModelParallelRegion）
 
 ```python
-# 文件：megatron/core/tensor_parallel/mappings.py:217-233
+# 文件：megatron/core/tensor_parallel/mappings.py
 class _ReduceFromModelParallelRegion(torch.autograd.Function):
     """All-reduce the input from the model parallel region."""
 
@@ -2121,7 +2121,7 @@ def reduce_from_tensor_model_parallel_region(input_, group):
 #### 6.3.3 AllReduce实现
 
 ```python
-# 文件：megatron/core/tensor_parallel/mappings.py:21-32
+# 文件：megatron/core/tensor_parallel/mappings.py
 def _reduce(input_, group):
     """All-reduce the input tensor across model parallel group."""
     assert group is not None, "group should not be None"
@@ -2143,7 +2143,7 @@ def _reduce(input_, group):
 
 ---
 
-## 7-9. 实验结果与分析（精简版）
+## 7. 实验结果与分析（精简版）
 
 由于详细的实验结果已在文档56中呈现，本章节仅补充**列并行和行并行特有的性能特征**。
 
@@ -2182,6 +2182,30 @@ def _reduce(input_, group):
 | 吞吐量 | 5218 | 5062 (-3%) |
 
 **结论**：序列并行以微小的吞吐量损失换取75%的激活内存节省。
+
+---
+
+## 8. 消融研究
+
+列并行与行并行的关键消融维度包括：
+
+- `gather_output`: 列并行后是否立即聚合输出。
+- `input_is_parallel`: 行并行输入是否已经按最后一维切分。
+- `sequence_parallel`: 是否把可切分激活沿序列维度分散。
+- 通信后端：AllReduce、ReduceScatter、AllGather的组合方式。
+
+消融结论应围绕通信量、峰值显存和端到端吞吐判断，而不是只看单个线性层的局部耗时。
+
+---
+
+## 9. 超参数分析
+
+列并行和行并行的主要配置参数是 tensor model parallel size。选择时需要同时满足：
+
+- `hidden_size`、`ffn_hidden_size`、`num_attention_heads` 能被 TP size 合理整除。
+- 单卡矩阵乘法规模仍能保持较高 GEMM 效率。
+- 通信量不超过节点内 NVLink 或跨节点 InfiniBand 的可隐藏范围。
+- 与 sequence parallel、pipeline parallel 和 micro-batch size 共同满足显存约束。
 
 ---
 
@@ -2429,4 +2453,3 @@ torch.testing.assert_close(baseline_output, tp_output, rtol=1e-3, atol=1e-5)
 **下一步**：
 - 继续编写文档58-60（注意力层、MLP层、词汇表并行）
 - 更新TODO.md标记文档57为已完成 ✅
-

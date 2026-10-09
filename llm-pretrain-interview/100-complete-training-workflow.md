@@ -1,4 +1,4 @@
-# 100-完整训练流程实战 (Complete Training Workflow Practice)
+# 100. 完整训练流程实战 (Complete Training Workflow Practice)
 
 ## 1. 引言 (Introduction)
 
@@ -1637,10 +1637,10 @@ class DynamicGradScaler:
                 self._growth_tracker = 0
 ```
 
-### 7.4 学习率调度器: `megatron/core/optimizer/lr_scheduler.py`
+### 7.4 学习率调度器: `megatron/core/optimizer_param_scheduler.py`
 
 ```python
-# megatron/core/optimizer/lr_scheduler.py
+# megatron/core/optimizer_param_scheduler.py
 
 class OptimizerParamScheduler:
     """
@@ -2847,7 +2847,7 @@ cd /checkpoints/gpt3/
 ls -dt iter_*/ | tail -n +6 | xargs rm -rf
 
 # 验证检查点完整性
-python tools/verify_checkpoint.py \
+python verify_checkpoint.py \
     --load /checkpoints/gpt3/iter_0100000
 ```
 
@@ -2858,7 +2858,7 @@ python tools/verify_checkpoint.py \
 grep "throughput" logs/train_*.log | awk '{print $NF}' > throughput.txt
 
 # 绘制损失曲线
-python tools/plot_training_loss.py \
+python plot_training_loss.py \
     --log-file logs/train_*.log \
     --output loss_curve.png
 ```
@@ -2915,7 +2915,7 @@ python tools/plot_training_loss.py \
 | **检查点保存** | `megatron/training/checkpointing.py: save_checkpoint()` | 100-250 |
 | **检查点加载** | `megatron/training/checkpointing.py: load_checkpoint()` | 250-400 |
 | **混合精度优化器** | `megatron/core/optimizer/optimizer.py: Float16OptimizerWithFloat16Params` | 300-600 |
-| **学习率调度器** | `megatron/core/optimizer/lr_scheduler.py: OptimizerParamScheduler` | 50-200 |
+| **学习率调度器** | `megatron/core/optimizer_param_scheduler.py: OptimizerParamScheduler` | 50-200 |
 | **GPT 模型** | `megatron/core/models/gpt/gpt_model.py: GPTModel` | 100-500 |
 | **Attention** | `megatron/core/transformer/attention.py: Attention` | 1014-1349 |
 | **MLP** | `megatron/core/transformer/mlp.py: MLP` | 24-352 |
@@ -2925,7 +2925,7 @@ python tools/plot_training_loss.py \
 
 **文档版本**: v1.0
 
-**最后更新**: 2026-01-02
+**最后更新**: 2026-05-10
 
 **Megatron-LM 版本**: v0.12.0
 

@@ -1,7 +1,7 @@
 # 65. 虚拟流水线并行(Virtual Pipeline / Interleaved Scheduling)
 
 **版本**: v1.0
-**最后更新**: 2026-01-01
+**最后更新**: 2026-05-10
 **Megatron-LM版本**: v0.12.0
 
 ---
@@ -72,7 +72,7 @@ Device 7: Layer 14-15, Layer 30-31
 
 ### 1.4 Megatron-LM实现
 
-**代码位置**: `megatron/core/pipeline_parallel/schedules.py:811-1923`
+**代码位置**: `megatron/core/pipeline_parallel/schedules.py`
 
 **核心函数**:
 ```python
@@ -1505,21 +1505,21 @@ nsys profile --trace=cuda,nvtx python pretrain_gpt.py ...
 
 ### 13.3 相关文档(本知识库)
 
-- [文档61: 流水线并行基础理论](61-pipeline-parallel-basics.md)
+- [文档61: 流水线并行基础理论](61-pipeline-parallelism-fundamentals.md)
 - [文档62: GPipe同步流水线并行](62-gpipe-synchronous-pipeline.md)
 - [文档63: PipeDream异步流水线并行](63-pipedream-asynchronous-pipeline.md)
 - [文档64: 1F1B调度策略详解](64-1f1b-scheduling-strategy.md)
-- [文档66: 气泡时间分析与优化](66-bubble-time-analysis.md) (待编写)
-- [文档67: P2P通信与激活传递](67-p2p-communication.md) (待编写)
+- [文档66: 气泡时间分析与优化](66-bubble-time-analysis-optimization.md)
+- [文档67: P2P通信与激活传递](67-p2p-communication-activation-transfer.md)
 
 ---
 
 **文档版本**: v1.0
 **Megatron-LM版本**: v0.12.0
 **贡献者**: LLM Pretraining Research Group
-**最后更新**: 2026-01-01
+**最后更新**: 2026-05-10
 
-**版权声明**: 本文档基于Megatron-LM v0.12.0源代码编写,代码版权归NVIDIA Corporation所有,遵循BSD 3-Clause License。
+**版权声明**: 本文档基于 Megatron-LM v0.12.0源代码编写,代码版权归NVIDIA Corporation所有,遵循BSD 3-Clause License。
 
 ---
 
@@ -1672,4 +1672,4 @@ print(f"  Efficiency: {total / (total + warmup) * 100:.1f}%")
 
 ---
 
-**本文档完成!** 如有疑问,请参考Megatron-LM源代码 `megatron/core/pipeline_parallel/schedules.py`。
+**本文档完成!** 如有疑问,请参考 Megatron-LM源代码 `megatron/core/pipeline_parallel/schedules.py`。

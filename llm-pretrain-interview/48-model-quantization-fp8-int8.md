@@ -3,9 +3,9 @@
 > **文档编号**: 48
 > **所属部分**: 第五部分 - 大语言模型架构详解 (41-50)
 > **代码位置**: `megatron/core/fp8_utils.py`, `megatron/core/fp4_utils.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 > **前置文档**: [08-浮点数表示](./08-floating-point-representation.md), [93-混合精度训练](./93-mixed-precision-training.md)
-> **后续文档**: [49-推理优化技术](./49-inference-optimization.md), [95-FP8训练](./95-fp8-training.md)
+> **后续文档**: [49-推理优化技术](./49-inference-optimization-techniques.md), [95-FP8训练](./95-fp8-training-transformer-engine.md)
 
 ---
 
@@ -23,7 +23,7 @@
 10. [深入探讨](#10-深入探讨)
 11. [总结](#11-总结)
 12. [参考文献](#12-参考文献)
-13. [附录](#13-附录)
+13. [附录](#附录)
 
 ---
 
@@ -768,7 +768,7 @@ config.fp8_interval = 1               # 每步更新缩放因子
 
 ### 6.3 FP8张量类型检测
 
-**文件**: `megatron/core/fp8_utils.py:96-119`
+**文件**: `megatron/core/fp8_utils.py`
 
 ```python
 def is_float8tensor(tensor: torch.Tensor) -> bool:
@@ -805,7 +805,7 @@ def dequantize_fp8_tensor(fp8_tensor: torch.Tensor) -> torch.Tensor:
 
 ### 6.4 FP8参数分片量化
 
-**文件**: `megatron/core/fp8_utils.py:233-266`
+**文件**: `megatron/core/fp8_utils.py`
 
 ```python
 def _quantize_param_shard_impl(
@@ -859,7 +859,7 @@ $$
 
 ### 6.5 FP8对齐大小
 
-**文件**: `megatron/core/fp8_utils.py:168-174`
+**文件**: `megatron/core/fp8_utils.py`
 
 ```python
 def get_fp8_align_size(fp8_recipe: Fp8Recipe) -> int:
@@ -921,7 +921,7 @@ config = TransformerConfig(
 
 ### 6.7 并行层中的列/行并行检测
 
-**文件**: `megatron/core/fp8_utils.py:176-194`
+**文件**: `megatron/core/fp8_utils.py`
 
 ```python
 def is_column_parallel_linear(module):
@@ -952,7 +952,7 @@ def is_row_parallel_linear(module):
 
 ### 6.8 FP8底层存储修改
 
-**文件**: `megatron/core/fp8_utils.py:226-231`
+**文件**: `megatron/core/fp8_utils.py`
 
 ```python
 def _modify_underlying_storage_impl(
@@ -974,7 +974,7 @@ def _modify_underlying_storage_impl(
 ```
 
 **使用场景**：
-- **DDP参数分桶**：将所有参数放入连续缓冲区（[文档52](./52-ddp-implementation.md)）
+- **DDP参数分桶**：将所有参数放入连续缓冲区（[文档52](./52-distributed-data-parallel-detailed.md)）
 - **FSDP参数分片**：修改参数存储位置（[文档71](./71-fsdp-implementation.md)）
 
 **数学对应**：
@@ -1723,8 +1723,8 @@ $$
 - [93-混合精度训练](./93-mixed-precision-training.md)：量化是混合精度的延伸
 
 **后续文档**：
-- [49-推理优化技术](./49-inference-optimization.md)：量化在推理中的应用
-- [95-FP8训练](./95-fp8-training.md)：FP8训练的完整流程
+- [49-推理优化技术](./49-inference-optimization-techniques.md)：量化在推理中的应用
+- [95-FP8训练](./95-fp8-training-transformer-engine.md)：FP8训练的完整流程
 - [40-KV Cache](./40-kv-cache-mechanism.md)：KV Cache的INT8量化
 
 **并行相关**：

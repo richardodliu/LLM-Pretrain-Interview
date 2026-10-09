@@ -2,8 +2,8 @@
 
 > **文档编号**: 25
 > **所属部分**: 第三部分 - Transformer基础架构 (21-30)
-> **代码位置**: `megatron/core/transformer/attention.py:350-401`, `megatron/core/transformer/enums.py:49-57`, `megatron/core/transformer/utils.py:32-44`, `megatron/core/fusions/fused_softmax.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM仓库实际代码)
+> **代码位置**: `megatron/core/transformer/attention.py`, `megatron/core/transformer/enums.py:49-57`, `megatron/core/transformer/utils.py:32-44`, `megatron/core/fusions/fused_softmax.py`
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ## 目录
 
@@ -56,9 +56,9 @@
 > **核心文件**:
 > - `megatron/core/transformer/enums.py:49-57` - AttnMaskType 枚举定义
 > - `megatron/core/transformer/utils.py:32-44` - 掩码生成函数
-> - `megatron/core/transformer/attention.py:350-401` - 推理时掩码调整
-> - `megatron/core/fusions/fused_softmax.py:179-360` - 融合掩码softmax
-> - `megatron/core/transformer/dot_product_attention.py:142-212` - 掩码应用于注意力计算
+> - `megatron/core/transformer/attention.py` - 推理时掩码调整
+> - `megatron/core/fusions/fused_softmax.py` - 融合掩码softmax
+> - `megatron/core/transformer/dot_product_attention.py` - 掩码应用于注意力计算
 
 > **测试文件**:
 > - `tests/unit_tests/transformer/test_utils.py` - 掩码使用示例
@@ -642,7 +642,7 @@ mask = get_sliding_window_causal_mask(1, 1024, (512, 0))
 
 #### 6.2.1 FusedScaleMaskSoftmax 类
 
-**文件路径**: `megatron/core/fusions/fused_softmax.py:179-360`
+**文件路径**: `megatron/core/fusions/fused_softmax.py`
 
 这是 Megatron 掩码实现的核心类,提供了**融合的缩放+掩码+softmax** 操作。
 
@@ -897,7 +897,7 @@ def forward_torch_softmax(self, input, mask, softmax_offset=None):
 
 #### 6.3.1 KV Cache 场景的掩码调整
 
-**文件路径**: `megatron/core/transformer/attention.py:360-401`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 def _adjust_key_value_for_inference(
@@ -984,7 +984,7 @@ Speedup: 20% (主要来自跳过掩码应用和 softmax 融合条件检查)
 
 ### 6.4 DotProductAttention 中的掩码集成
 
-**文件路径**: `megatron/core/transformer/dot_product_attention.py:142-212`
+**文件路径**: `megatron/core/transformer/dot_product_attention.py`
 
 ```python
 def forward(

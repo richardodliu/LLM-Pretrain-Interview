@@ -3,7 +3,7 @@
 > **文档编号**: 51
 > **所属部分**: 第六部分 - 数据并行 (51-55)
 > **代码位置**: `megatron/core/distributed/data_parallel_base.py`, `megatron/core/distributed/distributed_data_parallel.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 

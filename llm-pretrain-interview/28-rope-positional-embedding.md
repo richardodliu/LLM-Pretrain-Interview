@@ -4,7 +4,7 @@
 > **所属部分**: 第三部分 - Transformer基础架构 (21-30)
 > **对应原文档**: 03-attention-mechanisms.md Section 9
 > **代码位置**: `megatron/core/models/common/embeddings/rotary_pos_embedding.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: 基于 Megatron-LM 当前仓库的 RoPE 实现，并结合位置编码论文背景说明
 
 ---
 
@@ -346,9 +346,9 @@ Su et al. (2021) 在 WikiText-103 上的实验结果:
 | **RoPE** | **17.6** | **17.8** |
 
 **结论**:
-- RoPE 在训练困惑度上表现最好
-- 外推到 2 倍长度时,RoPE 几乎无性能下降
-- 绝对位置编码在外推时完全失效
+- 在该论文设置中，RoPE 的训练困惑度和长度外推表现较强。
+- RoPE 的相对位置信息来自旋转相位差，因此比绝对位置表更容易外推到更长位置。
+- 外推质量仍受训练长度、频率基底、插值策略和目标任务影响，不能只按表中数值直接迁移。
 
 ---
 
@@ -452,7 +452,20 @@ $$\text{score}(m, n) = (\mathbf{R}_m \mathbf{q}_m)^{\top} (\mathbf{R}_n \mathbf{
 
 ---
 
-## 参考文献
+## 11. 总结与最佳实践
+
+### 11.1 工程要点
+
+- RoPE只作用于查询和键，不作用于值向量。
+- 推理KV Cache中缓存的K必须与对应position一致。
+- 长度外推时优先记录 `rotary_base`、interpolation factor、YaRN/NTK配置，避免恢复或推理阶段不一致。
+
+### 11.2 常见错误
+
+- position id 与实际token位置错位会导致长上下文质量明显下降。
+- TP/CP切分下RoPE维度排列错误会造成不同rank结果不一致。
+
+## 12. 参考文献
 
 1. Su et al. (2021). "RoFormer: Enhanced Transformer with Rotary Position Embedding". arXiv:2104.09864.
 2. Vaswani et al. (2017). "Attention is All You Need". NeurIPS.
@@ -462,6 +475,326 @@ $$\text{score}(m, n) = (\mathbf{R}_m \mathbf{q}_m)^{\top} (\mathbf{R}_n \mathbf{
 
 ---
 
+## 附录 A：RoPE 维度约束
+
+RoPE 的实现需要保证被旋转的维度可以成对处理：
+
+| 字段 | 作用 | 约束 |
+|------|------|------|
+| `kv_channels` | 每头 Q/K 维度 | RoPE维度不能超过它 |
+| `rotary_percent` | 使用RoPE的维度比例 | 结果通常需要为偶数 |
+| `rotary_interleaved` | 维度排列方式 | checkpoint与推理必须一致 |
+| `rotary_base` | 频率基底 | 影响长位置相位 |
+| sequence offset | 推理位置偏移 | 必须与KV Cache位置一致 |
+
+典型配置：
+
+```text
+kv_channels = 128
+rotary_percent = 1.0
+rotary_dim = 128
+rotary_base = 10000
+rotary_interleaved = false
+```
+
+部分 RoPE 配置：
+
+```text
+kv_channels = 128
+rotary_percent = 0.5
+rotary_dim = 64
+pass_through_dim = 64
+```
+
+部分 RoPE 下，只有前 `rotary_dim` 维带有位置信息，其余维度保持内容表示。训练和推理必须使用同一切分方式。
+
+## 附录 B：实现路径审查
+
+| 目标 | 文件 | 审查点 |
+|------|------|--------|
+| RoPE频率构造 | `megatron/core/models/common/embeddings/rotary_pos_embedding.py` | base、dim、dtype、device |
+| RoPE应用 | `megatron/core/transformer/attention.py` | Q/K应用时机 |
+| inference offset | `megatron/core/transformer/attention.py` | decode只取当前位置 |
+| YaRN扩展 | `megatron/core/models/common/embeddings/yarn_rotary_pos_embedding.py` | scaling参数 |
+| Transformer配置 | `megatron/core/transformer/transformer_config.py` | rotary相关字段 |
+
+审查时要问：
+
+1. 旋转表长度是否覆盖训练或推理最大位置。
+2. context parallel 下 rotary 序列长度是否乘上 CP size。
+3. decode 时 query 用当前位置，key 写入 cache 前是否已旋转。
+4. checkpoint 中是否记录了 `rotary_base` 和 scaling 配置。
+5. 推理服务是否在 prompt chunking 时维护正确 offset。
+
+## 附录 C：位置错位故障
+
+RoPE 最隐蔽的问题是 position id 错位。常见症状：
+
+| 症状 | 可能原因 |
+|------|----------|
+| 短文本正常，长文本退化 | 推理使用的 base/scaling 与训练不同 |
+| batch size 变化后输出不同 | padding position 未正确处理 |
+| chunked prefill 后质量下降 | sequence offset 未累加 |
+| KV Cache 命中但输出异常 | cache 中 K 的位置与查询位置不一致 |
+| TP/CP 下结果不一致 | rotary embedding 切片不同 |
+| checkpoint 迁移后困惑度升高 | interleaved布局不一致 |
+
+排查顺序：
+
+1. 打印每个 token 的 position id。
+2. 对比一次性 prefill 与分块 prefill 的 logits。
+3. 关闭 KV Cache，对比 decode 输出。
+4. 固定 batch 中 padding，检查有效 token 的 position 是否不变。
+5. 检查训练脚本和推理脚本中的 base、percent、interleaved。
+
+## 附录 D：长上下文扩展策略
+
+| 策略 | 核心思想 | 优势 | 风险 |
+|------|----------|------|------|
+| 直接外推 | 使用训练时RoPE到更长位置 | 简单 | 高频相位可能失配 |
+| Linear scaling | position按比例缩小 | 易实现 | 可能牺牲短距离分辨率 |
+| NTK-aware | 调整频率基底 | 保持部分频率结构 | 参数选择敏感 |
+| YaRN | 插值和温度修正组合 | 实证表现强 | 配置更多 |
+| 继续训练 | 在长序列上适配 | 最可靠 | 成本高 |
+
+选择建议：
+
+- 只是轻微超过训练长度，先测试直接外推和简单 scaling。
+- 需要 4x 以上长度扩展，应做长上下文继续训练或高质量指令微调验证。
+- 如果服务中同时有短文本和长文本，要确认扩展策略不会显著损害短文本质量。
+- 所有长度扩展实验都应报告训练长度、目标长度和 evaluation 长度。
+
+## 附录 E：RoPE 与 KV Cache
+
+在自回归推理中，K 通常在写入 cache 前应用 RoPE：
+
+```text
+for each decode step t:
+    q_t = project_query(x_t)
+    k_t = project_key(x_t)
+    q_t = rope(q_t, position=t)
+    k_t = rope(k_t, position=t)
+    append k_t to kv_cache
+    attend q_t to cached keys
+```
+
+这样做的好处：
+
+- cache 中的 K 已经携带对应位置。
+- decode 时不必反复对历史 K 应用 RoPE。
+- chunked prefill 和 single prefill 更容易对齐。
+
+风险：
+
+- 如果 position offset 错，错误会被写入 cache 并持续影响后续 token。
+- 如果换了 RoPE scaling，旧 cache 不能继续复用。
+- 如果 prompt 被截断或滑窗移动，要重新定义位置口径。
+
+## 附录 F：数学不变量
+
+RoPE 的核心不变量是相对位置性质：
+
+$$
+\langle R_m q, R_n k \rangle
+= q^\top R_{n-m} k
+$$
+
+工程含义：
+
+1. 注意力分数能感知相对距离 $n-m$。
+2. Q 和 K 必须使用同一组旋转频率。
+3. V 不需要旋转，因为位置关系已经进入 attention weights。
+4. 如果 Q/K 维度切分不同，该不变量会被破坏。
+5. 旋转矩阵应保持范数，理论上不改变向量长度。
+
+可用于单元测试的不变量：
+
+| 测试 | 期望 |
+|------|------|
+| norm preservation | `norm(rope(x)) ~= norm(x)` |
+| position zero | `position=0` 时接近恒等变换 |
+| relative shift | 同时平移 Q/K 位置时分数结构一致 |
+| dtype consistency | BF16/FP32误差可解释 |
+| interleaved consistency | 同一布局训练推理一致 |
+
+## 附录 G：配置记录模板
+
+RoPE 配置必须写入实验记录：
+
+```yaml
+position_embedding:
+  type: rope
+  rotary_base:
+  rotary_percent:
+  rotary_interleaved:
+  seq_length_train:
+  seq_length_target:
+  scaling:
+    type:
+    factor:
+    original_max_position:
+    yarn_beta_fast:
+    yarn_beta_slow:
+```
+
+缺少这些字段会导致 checkpoint 复现困难。尤其是 long-context 继续训练后，推理脚本必须知道原始训练长度和缩放策略。
+
+## 附录 H：实验设计
+
+RoPE 实验建议至少包括：
+
+| 实验 | 固定项 | 变量 | 指标 |
+|------|--------|------|------|
+| base对比 | 模型、数据、长度 | `rotary_base` | validation loss |
+| percent对比 | head dim、base | `rotary_percent` | loss、速度 |
+| 外推对比 | 训练checkpoint | 目标长度 | long-context loss |
+| chunked prefill | 输入文本 | chunk size | logits一致性 |
+| cache一致性 | prompt | cache on/off | decode logits |
+| dtype对比 | 配置 | BF16/FP32 | 数值误差 |
+
+外推实验不能只用困惑度。还应测试：
+
+- needle-in-a-haystack 或长程检索。
+- 多文档问答。
+- 长代码补全。
+- 长对话位置一致性。
+- 短文本回归，确认没有短上下文退化。
+
+## 附录 I：面试题
+
+**RoPE 为什么能表达相对位置？**
+
+因为位置 $m$ 和 $n$ 的旋转点积可以化简为只依赖 $n-m$ 的相对旋转。注意力 logits 因此包含相对距离信息。
+
+**为什么不对 V 应用 RoPE？**
+
+V 被 attention weights 加权求和。位置信息通过 QK 分数决定权重后已经进入输出；旋转 V 会改变内容向量本身，通常没有必要。
+
+**RoPE 和 ALiBi 的主要差别是什么？**
+
+RoPE 改变 Q/K 表示，通过旋转相位进入点积；ALiBi 直接给 attention logits 加线性距离偏置。
+
+**为什么长上下文需要 scaling？**
+
+训练时没有见过的位置可能对应过高频或相位别名。scaling 试图把更长位置映射到训练可接受的频率范围。
+
+**interleaved 布局为什么重要？**
+
+它决定哪些维度成对旋转。训练和推理布局不一致会让同一权重看到不同的几何结构。
+
+## 附录 J：上线前检查
+
+1. 训练和推理的 `rotary_base` 一致。
+2. 训练和推理的 `rotary_percent` 一致。
+3. `rotary_interleaved` 与 checkpoint 匹配。
+4. 推理 position offset 在 prefill/decode/chunked prefill 中一致。
+5. KV Cache 中的 K 已按正确位置旋转。
+6. 长上下文 scaling 配置写入 checkpoint 或部署配置。
+7. CP/TP 下 rotary embedding 切片正确。
+8. 外推实验同时覆盖短文本和长文本。
+9. cache on/off 的短序列 logits 差异在容忍范围内。
+10. 文档中的外推结论标明论文或实验口径。
+
+## 附录 K：Checkpoint 迁移风险
+
+RoPE 本身没有可学习参数，但 checkpoint 迁移仍可能失败，因为权重是在某种位置编码语义下训练出来的。
+
+| 迁移项 | 是否可直接改 | 风险 |
+|--------|--------------|------|
+| `rotary_base` | 不建议 | 长短距离相位都变 |
+| `rotary_percent` | 不建议 | Q/K 部分维度语义变 |
+| `rotary_interleaved` | 不可随意改 | 维度配对完全不同 |
+| 最大长度 | 可扩展但需验证 | 外推退化 |
+| YaRN/NTK scaling | 需继续训练或评估 | 频率结构改变 |
+
+如果必须迁移：
+
+1. 先在短序列上对齐 logits。
+2. 再在训练长度附近测 validation loss。
+3. 最后测目标长上下文任务。
+4. 如果短序列已退化，不要继续解释为“外推问题”。
+
+## 附录 L：RoPE 与数据格式
+
+位置 id 不只是模型内部问题，也受数据管线影响：
+
+| 数据形态 | position 处理 |
+|----------|---------------|
+| packed sequence | 每个 segment 是否重置位置要与mask一致 |
+| multi-document batch | 文档边界是否可见 |
+| chat template | system/user/assistant token 都会消耗位置 |
+| padding left | position id 需要跳过pad或保持一致策略 |
+| padding right | causal mask通常更简单 |
+| sliding window | 窗口移动后位置是绝对还是相对 |
+
+训练和推理 position 策略不一致，会表现为“离线验证正常，在线长对话异常”。
+
+## 附录 M：源码阅读问答
+
+**为什么 `get_rotary_seq_len` 要考虑 inference context？**
+
+推理时需要为最大缓存长度或当前上下文生成足够的 RoPE 表，decode 阶段还要根据 sequence offset 选择当前位置。
+
+**为什么 context parallel 会影响 rotary 序列长度？**
+
+CP 会把序列维切分到不同 rank。为了保证全局位置一致，RoPE长度和切片必须按全局序列口径处理。
+
+**为什么 cache 中的 K 通常已经旋转？**
+
+这样 decode 时只需旋转当前 query/key，不必每步重算所有历史 key 的旋转。
+
+**如何判断 interleaved 配置错了？**
+
+短序列 logits、validation loss 或复制 checkpoint 后的质量会明显不一致；这是布局错误，不是普通随机波动。
+
+## 附录 N：最小一致性实验
+
+RoPE 的最小一致性实验应覆盖三条路径：
+
+```text
+path_1: full prefill
+path_2: chunked prefill
+path_3: prefill + decode with kv cache
+```
+
+同一输入下记录：
+
+```text
+max_abs_logit_diff(path_1, path_2)
+max_abs_logit_diff(path_1, path_3)
+position_ids
+sequence_offset
+rotary_base
+rotary_percent
+rotary_interleaved
+```
+
+通过标准：
+
+- FP32 下差异应接近数值舍入。
+- BF16/FP16 下差异应可解释。
+- 改变 chunk size 不应改变有效 token 的 position id。
+- padding 变化不应改变非 padding token 的相对位置语义。
+
+如果 cache 路径与 full prefill 不一致，优先检查 K 写入 cache 前是否已应用正确位置的 RoPE。
+
+## 附录 O：最终自检
+
+提交前检查：
+
+1. RoPE 结论是否标明论文或实验口径。
+2. 长度外推是否避免写成无条件保证。
+3. `rotary_base`、`rotary_percent`、`rotary_interleaved` 是否都被提及。
+4. KV Cache 场景是否说明 position offset。
+5. 是否说明 V 不应用 RoPE 的原因。
+6. 是否覆盖 chunked prefill。
+7. 是否覆盖 checkpoint 迁移风险。
+8. 是否说明训练和推理配置必须一致。
+9. 是否说明 position id 与 padding 策略的关系。
+10. 是否提供 cache on/off 对齐测试。
+
+---
+
 **文档版本**: v1.0
-**最后更新**: 2025-12-27
+**最后更新**: 2026-05-10
 **文档状态**: ✅ 已完成

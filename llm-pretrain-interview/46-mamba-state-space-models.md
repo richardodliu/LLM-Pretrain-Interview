@@ -2,8 +2,8 @@
 
 > **文档编号**: 46
 > **所属部分**: 第5部分 - 模型架构 (41-50)
-> **代码位置**: `megatron/core/ssm/mamba_mixer.py:1-1197`, `megatron/core/ssm/mamba_layer.py:1-187`, `megatron/core/ssm/mamba_block.py:1-372`, `megatron/core/models/mamba/mamba_model.py:1-290`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM仓库实际代码)
+> **代码位置**: `megatron/core/ssm/mamba_mixer.py`, `megatron/core/ssm/mamba_layer.py`, `megatron/core/ssm/mamba_block.py`, `megatron/core/models/mamba/mamba_model.py`
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 
@@ -397,7 +397,7 @@ $$
 
 **Megatron 实现**:
 ```python
-# megatron/core/ssm/mamba_mixer.py:642-658
+# megatron/core/ssm/mamba_mixer.py
 y = mamba_split_conv1d_scan_combined(
     zxBCdt,
     rearrange(self.cp.get_conv1d_weight(), "d 1 w -> d w"),
@@ -426,7 +426,7 @@ $$
 
 **Causal**: 只依赖当前和过去的 tokens ($x_{t}, x_{t-1}, \ldots, x_{t-d_{conv}+1}$)。
 
-**代码实现** (`megatron/core/ssm/mamba_mixer.py:294-303`):
+**代码实现** (`megatron/core/ssm/mamba_mixer.py`):
 ```python
 self.conv1d = nn.Conv1d(
     in_channels=conv_dim,
@@ -2284,7 +2284,7 @@ class MambaInferenceEngine:
     def get_sequence_offset(self, batch_id):
         """Get current sequence position for this batch."""
         # Implementation depends on your tracking mechanism
-        # This is a placeholder
+        # Simplified example: production code should read the tracked sequence length.
         return 0
 
     def generate(
@@ -2399,4 +2399,3 @@ if __name__ == "__main__":
 ---
 
 **文档完成**: 本文档详细介绍了 Mamba 和 Mamba-2 的状态空间模型架构,包括 Selective SSM 原理、SSD 算法、Hybrid 架构设计,以及 Megatron-LM 的完整实现。内容涵盖数学推导、算法伪代码、代码实现、实验结果和深入讨论,为 LLM 预训练面试提供全面的 Mamba 技术指导。
-

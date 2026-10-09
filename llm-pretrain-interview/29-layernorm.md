@@ -3,7 +3,7 @@
 > **文档编号**: 29
 > **所属部分**: 第三部分 - Transformer基础架构 (21-30)
 > **代码位置**: `megatron/core/transformer/torch_layer_norm.py`, `megatron/core/fusions/fused_layer_norm.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 
@@ -594,7 +594,7 @@ Output:
 
 #### 6.1.1 类定义
 
-**文件**: `megatron/core/fusions/fused_layer_norm.py:30-169`
+**文件**: `megatron/core/fusions/fused_layer_norm.py`
 
 ```python
 class FusedLayerNorm(torch.nn.Module):
@@ -743,7 +743,7 @@ def forward(self, input: Tensor) -> Tensor:
 
 #### 6.2.1 WrappedTorchNorm
 
-**文件**: `megatron/core/transformer/torch_norm.py:9-51`
+**文件**: `megatron/core/transformer/torch_norm.py`
 
 ```python
 class WrappedTorchNorm:
@@ -795,7 +795,7 @@ class WrappedTorchNorm:
 
 #### 6.3.1 LayerNorm的位置
 
-**文件**: `megatron/core/transformer/transformer_layer.py:285-337`
+**文件**: `megatron/core/transformer/transformer_layer.py`
 
 ```python
 # [Module 1: Pre-Attention LayerNorm] (Pre-Norm模式)
@@ -827,7 +827,7 @@ self.mlp = build_module(...)
 
 #### 6.3.2 Pre-Norm前向传播
 
-**文件**: `megatron/core/transformer/transformer_layer.py:490-550`(简化)
+**文件**: `megatron/core/transformer/transformer_layer.py`(简化)
 
 ```python
 def forward(self, hidden_states, ...):
@@ -1478,4 +1478,4 @@ float inv_std = rsqrtf(var_val + eps);  // 使用rsqrt(快速倒数平方根)
 **版本**: 1.0
 **最后更新**: 2025-12-27
 **作者**: Claude Code (Sonnet 4.5)
-**代码验证**: ✅ 100% (所有代码引用均已验证)
+**代码锚点**: ✅ 已标注关键实现参考

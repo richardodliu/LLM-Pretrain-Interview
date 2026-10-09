@@ -111,7 +111,7 @@
 
 ### 1.4 代码位置
 
-> **核心文件**: `megatron/core/optimizer/grad_scaler.py:1-143`
+> **核心文件**: `megatron/core/optimizer/grad_scaler.py`
 >
 > **相关文件**:
 > - `megatron/core/optimizer/optimizer.py:434-620` (MixedPrecisionOptimizer)
@@ -823,7 +823,7 @@ Output:
 
 ### 6.1 MegatronGradScaler基类
 
-**文件路径**: `megatron/core/optimizer/grad_scaler.py:11-36`
+**文件路径**: `megatron/core/optimizer/grad_scaler.py`
 
 ```python
 from abc import ABC, abstractmethod
@@ -884,7 +884,7 @@ class MegatronGradScaler(ABC):
 
 ### 6.2 ConstantGradScaler实现
 
-**文件路径**: `megatron/core/optimizer/grad_scaler.py:38-51`
+**文件路径**: `megatron/core/optimizer/grad_scaler.py`
 
 ```python
 class ConstantGradScaler(MegatronGradScaler):
@@ -932,7 +932,7 @@ loss_scaled.backward()
 
 ### 6.3 DynamicGradScaler实现
 
-**文件路径**: `megatron/core/optimizer/grad_scaler.py:53-143`
+**文件路径**: `megatron/core/optimizer/grad_scaler.py`
 
 ```python
 class DynamicGradScaler(MegatronGradScaler):
@@ -3327,6 +3327,6 @@ $$
 
 **维护日志**：
 - 2026-01-01：初始版本（v1.0）
-- 基于Megatron-LM v0.12.0代码实现
+- 基于 Megatron-LM v0.12.0代码实现
 - 所有代码路径已验证
 - 所有参考文献已通过MCP检索验证

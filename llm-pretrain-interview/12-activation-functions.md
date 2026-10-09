@@ -5,7 +5,7 @@
 > **代码位置**: `megatron/core/activations.py`, `megatron/core/fusions/fused_bias_gelu.py`, `megatron/core/fusions/fused_bias_swiglu.py`
 > **MLP 集成**: `megatron/core/transformer/mlp.py:154-226`
 > **配置文件**: `megatron/core/transformer/transformer_config.py:154-168`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 

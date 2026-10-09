@@ -837,7 +837,7 @@ class TopKRouter(Router):
         return probs, routing_map
 ```
 
-**Load Balancing Loss** (`megatron/core/transformer/moe/router.py:270-296`):
+**Load Balancing Loss** (`megatron/core/transformer/moe/router.py`):
 ```python
 def _apply_aux_loss(
     self, probs: torch.Tensor, scores_for_aux_loss: torch.Tensor, routing_map: torch.Tensor

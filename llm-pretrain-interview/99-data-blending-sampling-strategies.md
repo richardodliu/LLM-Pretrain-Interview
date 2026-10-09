@@ -1,9 +1,9 @@
 # 99. 数据混合与采样策略 (Data Blending and Sampling Strategies)
 
-> **代码位置**: `megatron/core/datasets/blended_dataset.py:24-240` (BlendedDataset核心实现)
-> **配置模块**: `megatron/core/datasets/blended_megatron_dataset_config.py:16-219` (BlendedMegatronDatasetConfig)
-> **构建器模块**: `megatron/core/datasets/blended_megatron_dataset_builder.py:29-582` (BlendedMegatronDatasetBuilder)
-> **C++加速**: `megatron/core/datasets/helpers_cpp` (高效索引构建)
+> **代码位置**: `megatron/core/datasets/blended_dataset.py` (BlendedDataset核心实现)
+> **配置模块**: `megatron/core/datasets/blended_megatron_dataset_config.py` (BlendedMegatronDatasetConfig)
+> **构建器模块**: `megatron/core/datasets/blended_megatron_dataset_builder.py` (BlendedMegatronDatasetBuilder)
+> **C++加速**: `megatron/core/datasets/helpers.cpp` (高效索引构建)
 > **核心论文**: Brown et al. (2020), "Language Models are Few-Shot Learners", NeurIPS 2020, arXiv:2005.14165
 
 ---
@@ -76,9 +76,9 @@ config = BlendedMegatronDatasetConfig(
 - 内存映射文件 (mmap)
 
 **相关概念**:
-- [文档98: 数据加载与索引化](/llm-pretrain-interview/98-data-loading-indexing.md)
-- [文档97: 数据预处理与Tokenization](/llm-pretrain-interview/97-data-preprocessing-tokenization.md)
-- [文档52: 分布式数据并行](/llm-pretrain-interview/52-distributed-data-parallel-detailed.md)
+- [文档98: 数据加载与索引化](98-indexed-dataset-data-loading.md)
+- [文档97: 数据预处理与Tokenization](97-data-preprocessing-tokenization.md)
+- [文档52: 分布式数据并行](52-distributed-data-parallel-detailed.md)
 
 ### 1.3 文档组织
 
@@ -91,10 +91,10 @@ config = BlendedMegatronDatasetConfig(
 
 ### 1.4 代码位置
 
-> **核心模块**: `megatron/core/datasets/blended_dataset.py:24-240`
-> **配置类**: `megatron/core/datasets/blended_megatron_dataset_config.py:16-219`
-> **构建器**: `megatron/core/datasets/blended_megatron_dataset_builder.py:29-582`
-> **C++加速**: `megatron/core/datasets/helpers_cpp` (build_blending_indices)
+> **核心模块**: `megatron/core/datasets/blended_dataset.py`
+> **配置类**: `megatron/core/datasets/blended_megatron_dataset_config.py`
+> **构建器**: `megatron/core/datasets/blended_megatron_dataset_builder.py`
+> **C++加速**: `megatron/core/datasets/helpers.cpp` (build_blending_indices)
 
 **相关文件**:
 ```
@@ -620,7 +620,7 @@ Output: split_dataset            // 切分后的数据集
 
 ### 6.1 BlendedMegatronDatasetConfig配置类
 
-**文件**: `megatron/core/datasets/blended_megatron_dataset_config.py:16-219`
+**文件**: `megatron/core/datasets/blended_megatron_dataset_config.py`
 
 ```python
 from dataclasses import dataclass, field
@@ -799,7 +799,7 @@ def convert_split_vector_to_split_matrix(
 
 ### 6.2 BlendedDataset核心类
 
-**文件**: `megatron/core/datasets/blended_dataset.py:24-240`
+**文件**: `megatron/core/datasets/blended_dataset.py`
 
 ```python
 class BlendedDataset(torch.utils.data.Dataset):
@@ -1008,7 +1008,7 @@ dataset_sample_index = numpy.array([412, 89, 5031, 1092, 7, 891, 2341, 66, 234, 
 
 ### 6.3 BlendedMegatronDatasetBuilder构建器
 
-**文件**: `megatron/core/datasets/blended_megatron_dataset_builder.py:29-582`
+**文件**: `megatron/core/datasets/blended_megatron_dataset_builder.py`
 
 ```python
 class BlendedMegatronDatasetBuilder:
@@ -2065,16 +2065,16 @@ config.defer_npy_index_mmap = True
 ### 11.5 与其他文档的联系
 
 **前置知识**:
-- [文档97: 数据预处理与Tokenization](/llm-pretrain-interview/97-data-preprocessing-tokenization.md)
-- [文档98: 数据加载与索引化](/llm-pretrain-interview/98-data-loading-indexing.md)
+- [文档97: 数据预处理与Tokenization](97-data-preprocessing-tokenization.md)
+- [文档98: 数据加载与索引化](98-indexed-dataset-data-loading.md)
 
 **后续应用**:
-- [文档100: 完整训练流程实战](/llm-pretrain-interview/100-complete-training-pipeline.md)
-- [文档52: 分布式数据并行](/llm-pretrain-interview/52-distributed-data-parallel-detailed.md)
+- [文档100: 完整训练流程实战](100-complete-training-workflow.md)
+- [文档52: 分布式数据并行](52-distributed-data-parallel-detailed.md)
 
 **相关主题**:
-- [文档03: 概率论与信息论](/llm-pretrain-interview/03-probability-information-theory.md) (采样理论)
-- [文档50: Scaling Laws](/llm-pretrain-interview/50-scaling-laws.md) (数据规模)
+- [文档03: 概率论与信息论](03-probability-information-theory.md) (采样理论)
+- [文档50: Scaling Laws](50-scaling-laws.md) (数据规模)
 
 ---
 

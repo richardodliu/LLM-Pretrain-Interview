@@ -1,7 +1,7 @@
 # 72. 混合并行策略设计 (Hybrid Parallelism Strategy Design)
 
 **版本**: 1.0
-**最后更新**: 2026-01-01
+**最后更新**: 2026-05-10
 **Megatron-LM 版本**: v0.12.0
 
 > **代码位置**: `megatron/core/parallel_state.py:1-900` (进程组初始化)
@@ -2107,7 +2107,7 @@ def initialize_model_parallel(
 
 ### 6.3 单元测试
 
-**测试文件**: `tests/unit_tests/dist_checkpointing/test_parallel_state.py`
+**测试文件**: `tests/unit_tests/test_parallel_state.py`
 
 ```python
 import pytest
@@ -3267,7 +3267,7 @@ def load_checkpoint(model, optimizer, checkpoint_dir):
 
 ```bash
 # 将TP=4, PP=8的checkpoint转换为TP=8, PP=4
-python tools/checkpoint/util.py \
+python tools/checkpoint/convert.py \
     --model-type GPT \
     --load-dir checkpoints/tp4_pp8/ \
     --save-dir checkpoints/tp8_pp4/ \

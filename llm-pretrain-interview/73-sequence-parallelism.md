@@ -828,7 +828,7 @@ class ReduceScatterToSequenceParallelRegion(torch.autograd.Function):
 
 #### 6.1.1 序列维度切分：`_split_along_first_dim()`
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:56-77`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 def _split_along_first_dim(input_, group):
@@ -870,7 +870,7 @@ $$
 
 #### 6.1.2 序列维度拼接：`_gather_along_first_dim()`
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:114-153`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 def _gather_along_first_dim(input_, group, output_split_sizes=None, use_global_buffer=False):
@@ -935,7 +935,7 @@ $$
 
 #### 6.1.3 ReduceScatter 实现：`_reduce_scatter_along_first_dim()`
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:155-194`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 def _reduce_scatter_along_first_dim(input_, group, input_split_sizes=None, use_global_buffer=False):
@@ -996,7 +996,7 @@ $$
 
 #### 6.2.1 `_ScatterToSequenceParallelRegion`
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:276-294`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _ScatterToSequenceParallelRegion(torch.autograd.Function):
@@ -1042,7 +1042,7 @@ $$
 
 #### 6.2.2 `_GatherFromSequenceParallelRegion`
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:296-349`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _GatherFromSequenceParallelRegion(torch.autograd.Function):
@@ -1133,7 +1133,7 @@ else:
 
 #### 6.2.3 `_ReduceScatterToSequenceParallelRegion`
 
-**文件路径**: `megatron/core/tensor_parallel/mappings.py:351-378`
+**文件路径**: `megatron/core/tensor_parallel/mappings.py`
 
 ```python
 class _ReduceScatterToSequenceParallelRegion(torch.autograd.Function):
@@ -1189,7 +1189,7 @@ $$
 
 #### 6.3.1 `ColumnParallelLinear` 的序列并行适配
 
-**文件路径**: `megatron/core/tensor_parallel/layers.py:425-428, 472-477`
+**文件路径**: `megatron/core/tensor_parallel/layers.py, 472-477`
 
 ```python
 def forward(ctx, input, weight, bias, ...):

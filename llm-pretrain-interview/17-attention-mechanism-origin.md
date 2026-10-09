@@ -3,8 +3,8 @@
 > **文档编号**: 17
 > **所属部分**: 第二部分 - 深度学习基础 (11-20)
 > **对应原文档**: RNN序列建模与注意力机制
-> **代码位置**: `megatron/core/transformer/attention.py:1-100` (现代注意力实现的历史背景)
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码和历史文献)
+> **代码位置**: `megatron/core/transformer/attention.py` (现代注意力实现的历史背景)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码和历史文献)
 
 ---
 
@@ -82,7 +82,7 @@
 > **历史背景**: `megatron/core/transformer/attention.py` 中的现代实现虽然是完全的注意力架构,但继承了从RNN Attention演进而来的数学基础
 >
 > **相关文件**:
-> - `megatron/core/transformer/dot_product_attention.py:100-250` (点积注意力的现代实现,与Attention数学相关)
+> - `megatron/core/transformer/dot_product_attention.py` (点积注意力的现代实现,与Attention数学相关)
 > - `megatron/core/transformer/transformer_block.py` (Attention在Transformer中的使用)
 > - PyTorch文档中的注意力实现参考
 >

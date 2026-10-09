@@ -83,7 +83,7 @@
 > - **CP进程组获取**: `megatron/core/parallel_state.py:1384-1410` (get_context_parallel_group等)
 > - **CP世界大小/rank**: `megatron/core/parallel_state.py:1692-1725` (CP并行度查询)
 > - **Transformer Engine集成**: `megatron/core/extensions/transformer_engine.py:1156-1246` (CP通信配置)
-> - **多模态CP工具**: `megatron/core/models/multimodal/context_parallel.py:1-112` (padding计算)
+> - **多模态CP工具**: `megatron/core/models/multimodal/context_parallel.py` (padding计算)
 > - **Mamba CP实现**: `megatron/core/ssm/mamba_context_parallel.py` (SSM模型的CP)
 >
 > **相关配置文件**:
@@ -160,15 +160,15 @@
 
 | 技术 | 序列长度 | 内存占用 | 精度 | 通信开销 | 适用场景 |
 |------|----------|----------|------|----------|----------|
-| **Vanilla Attention** | $O(n^2)$ | $O(n^2)$ HBM | 完全精确 | 无 | 短序列（<8K） |
-| **Flash Attention** | $O(n^2)$ | $O(n)$ HBM | 完全精确 | 无 | 单卡长序列（<128K） |
+| **Vanilla Attention** | $O(n^2)$ | $O(n^2)$ HBM | 完整注意力语义 | 无 | 短序列（<8K） |
+| **Flash Attention** | $O(n^2)$ | $O(n)$ HBM | 完整注意力语义 | 无 | 单卡长序列（<128K） |
 | **Sparse Attention** | $O(n \sqrt{n})$ | $O(n \sqrt{n})$ | 近似 | 无 | 特定稀疏模式 |
-| **Ring Attention (CP)** | $O(n^2)$ | $O(n/P)$ | **完全精确** | $O(n \cdot d)$ per device | **超长序列（>128K）** |
-| **Striped Attention** | $O(n^2)$ | $O(n)$ KV全复制 | 完全精确 | $O(n_q \cdot d)$ | Q较大场景 |
+| **Ring Attention (CP)** | $O(n^2)$ | $O(n/P)$ | **完整注意力语义** | $O(n \cdot d)$ per device | **超长序列（>128K）** |
+| **Striped Attention** | $O(n^2)$ | $O(n)$ KV全复制 | 完整注意力语义 | $O(n_q \cdot d)$ | Q较大场景 |
 
 **关键观察**：
 
-1. **精度保证**：Ring Attention是唯一在多设备上保持完全精确的长序列方法
+1. **精度保证**：Ring Attention是多设备上保持完整注意力语义的典型长序列方法之一；实际浮点结果仍可能受规约顺序影响
 2. **内存扩展**：CP可将可处理序列长度扩展P倍（P为CP并行度）
 3. **通信代价**：每个attention block需要通信 $O(bd)$ 大小的KV块（b为block大小）
 4. **计算等价**：通过Online Softmax保证与单设备计算的数值等价性
@@ -1252,7 +1252,7 @@ Megatron模型
 
 **关键代码位置**：
 
-- **CP检查**: `megatron/core/transformer/dot_product_attention.py:56-58`
+- **CP检查**: `megatron/core/transformer/dot_product_attention.py`
 
 ```python
 assert (
@@ -1264,7 +1264,7 @@ assert (
 
 #### 6.1.3 多模态CP工具
 
-**文件路径**: `megatron/core/models/multimodal/context_parallel.py:9-59`
+**文件路径**: `megatron/core/models/multimodal/context_parallel.py`
 
 ```python
 def get_padding(
@@ -1380,7 +1380,7 @@ padding = get_padding(2300, 4, 2, True)
 
 **PackedSeqParams生成**：
 
-**文件路径**: `megatron/core/models/multimodal/context_parallel.py:62-112`
+**文件路径**: `megatron/core/models/multimodal/context_parallel.py`
 
 ```python
 def get_packed_seq_params(tokens, img_seq_len, padding_needed, cp_size, use_packed_sequence=False):
@@ -1569,7 +1569,7 @@ Megatron同时支持Sequence Parallelism (SP)和Context Parallelism (CP)，它�
 | **内存节省** | 较少（仅非Attention层） | 显著（Attention占主导） |
 | **通信模式** | All-Gather + Reduce-Scatter | Ring (p2p) / All-Gather / a2a |
 | **通信量** | $O(s \cdot h)$ per layer | $O(s \cdot d \cdot n)$ per attention |
-| **是否精确** | 完全精确 | 完全精确（Online Softmax保证） |
+| **是否精确** | 完整注意力语义 | 完整注意力语义（Online Softmax保证，浮点规约顺序可能带来微小差异） |
 | **适用序列长度** | 所有长度 | 超长序列（>64K） |
 | **配置参数** | `sequence_parallel=True` | `context_parallel_size>1` |
 
@@ -2171,7 +2171,7 @@ Memory (GB)
 | Ring | 259 GB | 6.5 GB | 100% |
 | All-Gather | 1,036 GB (OOM) | 6.5 GB | 50% |
 
-**结论**: Ring是唯一可行方案。
+**结论**: 在该示例配置下，Ring相比All-Gather更可行；实际选择还取决于序列长度、显存余量和通信拓扑。
 
 #### 8.2.2 为什么需要Online Softmax?
 

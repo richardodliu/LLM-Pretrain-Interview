@@ -4,9 +4,9 @@
 > **所属部分**: 第五部分 - 大语言模型架构详解 (41-50)
 > **对应原论文**: Language Models are Unsupervised Multitask Learners (Radford et al., 2019)
 > **核心论文**: Language Models are Few-Shot Learners (Brown et al., 2020) - GPT-3
-> **代码位置**: `megatron/core/models/gpt/gpt_model.py:39-786`, `pretrain_gpt.py`
+> **代码位置**: `megatron/core/models/gpt/gpt_model.py`, `pretrain_gpt.py`
 > **示例代码**: `examples/gpt3/train_gpt3_175b_distributed.sh`
-> **代码覆盖率**: ✅ 100% (所有内容均基于 Megatron-LM v0.12.0 仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 仓库实际代码)
 
 ---
 
@@ -109,7 +109,7 @@ GPT 系列模型的演进：
 GPT 架构在 Megatron-LM 中的实现位于以下文件：
 
 **核心模型实现**：
-- `megatron/core/models/gpt/gpt_model.py:39-786` - `GPTModel` 类定义
+- `megatron/core/models/gpt/gpt_model.py` - `GPTModel` 类定义
 - `megatron/core/models/gpt/gpt_layer_specs.py` - GPT 层规格定义
 - `megatron/core/transformer/transformer_block.py` - TransformerBlock 实现
 - `megatron/core/transformer/transformer_layer.py` - TransformerLayer 实现
@@ -325,7 +325,7 @@ French:
   3. PPO 优化：使用 PPO 算法最大化奖励
 
 **GPT-4 (2023)**：
-- 参数量未公开（推测 1T+ 参数，MoE 架构）
+- 参数量与内部架构未公开，本文不引用未经官方确认的规模推断
 - 多模态能力：支持图像输入
 - 更长上下文：8K / 32K 上下文窗口
 - 更强的推理、代码、创作能力
@@ -1647,7 +1647,7 @@ Output:
 
 #### 7.1.1 GPTModel 类定义
 
-**文件路径**: `megatron/core/models/gpt/gpt_model.py:39-786`
+**文件路径**: `megatron/core/models/gpt/gpt_model.py`
 
 ```python
 class GPTModel(LanguageModule):
@@ -2126,7 +2126,7 @@ class TransformerBlock(MegatronModule):
 
 ### 7.3 Transformer Layer 实现（Pre-LN）
 
-**文件路径**: `megatron/core/transformer/transformer_layer.py:40-500`
+**文件路径**: `megatron/core/transformer/transformer_layer.py`
 
 ```python
 class TransformerLayer(BaseTransformerLayer):
@@ -2577,9 +2577,9 @@ if __name__ == "__main__":
 #### 8.1.1 硬件环境
 
 **GPT-3 175B 训练配置**（Brown et al., 2020）：
-- **GPU**: 未公开（推测 NVIDIA V100 或 A100）
-- **节点数**: 数百到上千节点
-- **总 GPU 数**: 数千张（估计 10,000+ V100）
+- **GPU**: 论文未公开完整硬件清单，本文不把具体 GPU 型号作为确定结论
+- **节点数**: 数百到上千节点量级
+- **总 GPU 数**: 数千到万卡量级估算，仅用于说明系统规模
 - **网络**: 高速 InfiniBand 互联
 - **存储**: 分布式文件系统（PB 级）
 
@@ -4242,7 +4242,7 @@ $$
 
 **文档完成时间**: 2025-12-28
 **文档长度**: ~2,200 行
-**代码覆盖率**: ✅ 100% (所有引用均基于 Megatron-LM v0.12.0)
+**代码锚点**: ✅ 已标注关键实现参考 (关键引用参考 Megatron-LM v0.12.0)
 **质量等级**: ⭐⭐⭐⭐⭐ (研究著作级)
 
 ---

@@ -3,8 +3,8 @@
 > **文档编号**: 34
 > **所属部分**: 第四部分 - 高级注意力机制 (31-40)
 > **对应原文档**: Flash Attention: Fast and Memory-Efficient Exact Attention with IO-Awareness (Dao et al., 2022)
-> **代码位置**: `megatron/core/transformer/attention.py:85-88, 570-650` (Flash Attention集成)
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码和Flash Attention论文)
+> **代码位置**: `megatron/core/transformer/attention.py, 570-650` (Flash Attention集成)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码和Flash Attention论文)
 
 ---
 
@@ -30,7 +30,7 @@
 
 ### 1.1 概述
 
-**Flash Attention** 是一种革命性的注意力计算算法，由斯坦福大学 Tri Dao 等人于 2022 年提出。它通过 **IO感知** (IO-aware) 的设计，从根本上解决了标准注意力机制的内存访问瓶颈，在保持精确计算的同时，实现了 2-4倍的加速和显著的内存节省。
+**Flash Attention** 是一种重要的注意力计算算法，由斯坦福大学 Tri Dao 等人于 2022 年提出。它通过 **IO感知** (IO-aware) 的设计，大幅缓解了标准注意力机制的内存访问瓶颈，在保持完整注意力语义的同时，实现了 2-4倍的加速和显著的内存节省。
 
 #### 传统注意力的瓶颈
 
@@ -219,7 +219,7 @@ NeurIPS 2022
 Megatron-LM 采用 **可选依赖** 的方式集成 Flash Attention：
 
 ```python
-# megatron/core/transformer/attention.py:85-88
+# megatron/core/transformer/attention.py
 try:
     from flash_attn import flash_attn_varlen_func, flash_attn_with_kvcache
 except:
@@ -951,7 +951,7 @@ Output: dQ, dK, dV ∈ ℝ^(N×d)  # 输入梯度
 
 #### 6.1.1 Flash Attention 库导入
 
-**文件路径**: `megatron/core/transformer/attention.py:85-88`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 # Flash Attention 2 导入
@@ -973,7 +973,7 @@ except:
 
 #### 6.1.2 变长序列 Flash Attention
 
-**文件路径**: `megatron/core/transformer/attention.py:639-649`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 # 使用 Flash Attention 2 处理变长序列
@@ -1015,7 +1015,7 @@ output_total = flash_attn_varlen_func(
 
 #### 6.1.3 Flash Attention 3 支持
 
-**文件路径**: `megatron/core/transformer/attention.py:597-634`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 if HAVE_FA3:
@@ -1194,7 +1194,7 @@ block_table=block_table
 
 ### 6.3 单元测试
 
-**测试文件**: `tests/unit_tests/transformer/test_attention.py` (推测位置)
+**测试文件**: `tests/unit_tests/transformer/test_attention.py`
 
 **关键测试**：
 
@@ -2666,5 +2666,5 @@ $$
 
 **下一步**：
 - 继续学习 [文档 35: Flash Attention v2](./35-flash-attention-v2.md)
-- 了解 [文档 36: Flash Attention v3 与 FP8](./36-flash-attention-v3.md)
-- 探索 [文档 39: 长序列注意力优化](./39-long-sequence-attention.md)
+- 了解 [文档 36: Flash Attention v3 与 FP8](./36-flash-attention-v3-fp8.md)
+- 探索 [文档 39: 长序列注意力优化](./39-long-context-attention-optimization.md)

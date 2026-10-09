@@ -2302,12 +2302,12 @@ python pretrain_gpt.py \
 
 **后续文档**：
 - [文档86](86-learning-rate-scheduling.md)：学习率调度策略
-- [文档87](87-gradient-clipping.md)：梯度裁剪
+- [文档87](90-gradient-clipping.md)：梯度裁剪
 - [文档88](88-distributed-optimizer.md)：分布式优化器
 
 **相关文档**：
 - [文档93-96](93-mixed-precision-training.md)：混合精度训练
-- [文档55.1](55.1-gradient-accumulation-activation-checkpointing.md)：梯度累积
+- [文档55.1](55.1-gradient-accumulation-detailed.md)：梯度累积
 
 ### 13.7 总结陈述
 

@@ -112,7 +112,7 @@
 > - `megatron/core/transformer/moe/moe_utils.py:872-890` - Expert Bias更新
 
 > **相关文件**:
-> - `megatron/core/transformer/moe/router.py:130-399` - TopKRouter类（负载均衡集成）
+> - `megatron/core/transformer/moe/router.py` - TopKRouter类（负载均衡集成）
 > - `megatron/core/transformer/moe/moe_layer.py` - MoE层实现
 > - `megatron/core/transformer/moe/token_dispatcher.py` - Token分发与容量管理
 > - `megatron/core/extensions/transformer_engine.py` - 融合负载均衡kernel（TE后端）
@@ -227,7 +227,7 @@ Megatron-LM v0.12.0提供了**业界最全面的MoE负载均衡实现**，支持
 #### 2.3.1 多级负载均衡损失
 
 ```python
-# megatron/core/transformer/moe/router.py:156-157
+# megatron/core/transformer/moe/router.py
 self.routing_type = self.config.moe_router_load_balancing_type
 # 支持: "aux_loss", "seq_aux_loss", "global_aux_loss", 或列表组合
 ```
@@ -1367,7 +1367,7 @@ class BaseMoELayer(MegatronModule):
 **Step 2：Router计算路由**（`router.py:130-399`）
 
 ```python
-# megatron/core/transformer/moe/router.py:284-296
+# megatron/core/transformer/moe/router.py
 def _apply_aux_loss(self, probs, scores_for_aux_loss, routing_map):
     aux_loss_coeff = self.get_aux_loss_coeff("aux_loss")
     if aux_loss_coeff == 0:
@@ -2914,7 +2914,7 @@ def get_updated_expert_bias(tokens_per_expert, expert_bias, expert_bias_update_r
 **调用**（在Router中）：
 
 ```python
-# megatron/core/transformer/moe/router.py:161-179
+# megatron/core/transformer/moe/router.py
 if self.enable_expert_bias:
     self.register_buffer('expert_bias', torch.zeros(num_experts))
     self.register_buffer('local_tokens_per_expert', torch.zeros(num_experts))
@@ -3136,7 +3136,7 @@ $$
 
 #### 10.3.3 Megatron实现
 
-**文件位置**：`megatron/core/transformer/moe/router.py:298-340`
+**文件位置**：`megatron/core/transformer/moe/router.py`
 
 ```python
 def _apply_seq_aux_loss(
@@ -3306,7 +3306,7 @@ def sinkhorn(cost: torch.Tensor, tol: float = 0.0001):
 **使用**（在Router中）：
 
 ```python
-# megatron/core/transformer/moe/router.py:215-246
+# megatron/core/transformer/moe/router.py
 def sinkhorn_load_balancing(self, logits: torch.Tensor):
     """Apply sinkhorn routing to the logits tensor."""
 

@@ -1,7 +1,7 @@
 # 61. 流水线并行基础理论 (Pipeline Parallelism Fundamentals)
 
 **版本**: 1.0
-**最后更新**: 2025-12-31
+**最后更新**: 2026-05-10
 **Megatron-LM 版本**: v0.12.0
 
 ---
@@ -2523,7 +2523,7 @@ def custom_backward(output, grad_output):
 
 ### 10.6 配置与使用示例
 
-**训练脚本配置** (`examples/pretrain_gpt.sh`):
+**训练脚本配置** (`examples/gpt3/train_gpt3_175b_distributed.sh`):
 
 ```bash
 #!/bin/bash
@@ -3267,7 +3267,7 @@ python -m torch.distributed.run \
 - Google: PaLM (540B) 使用PP
 - Microsoft: Megatron-Turing NLG (530B) 使用3D并行
 - Meta: LLaMA (65B) 使用FSDP + PP
-- OpenAI: GPT-4 (推测使用PP)
+- OpenAI: GPT-4 训练并行配置未公开, 不作为确定案例引用
 
 **下一步学习**：
 - 文档62-67：深入学习GPipe、PipeDream、1F1B等高级调度策略

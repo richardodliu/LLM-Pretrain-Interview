@@ -4,7 +4,7 @@
 > **所属部分**: 第二部分 - 深度学习基础 (11-20)
 > **对应原文档**: OVERVIEW.md Section 18
 > **代码位置**: `megatron/core/models/common/embeddings/language_model_embedding.py`, `megatron/core/models/common/embeddings/rotary_pos_embedding.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 
@@ -1200,7 +1200,7 @@ rope_scaling_factor: 8.0  # YaRN缩放
 **最后更新**: 2025-12-28
 **文档版本**: 1.0
 **对应Megatron版本**: v0.12.0
-**代码覆盖率**: 100%
+**代码锚点**: 已标注关键实现参考
 
 ---
 

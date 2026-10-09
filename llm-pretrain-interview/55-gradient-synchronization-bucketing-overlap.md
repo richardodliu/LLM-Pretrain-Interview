@@ -5,7 +5,7 @@
 > **前置文档**: [51-数据并行原理](./51-data-parallelism-fundamentals.md), [52-DDP详解](./52-distributed-data-parallel-detailed.md), [53-AllReduce通信原语](./53-allreduce-communication-primitive.md), [54-Ring-AllReduce算法](./54-ring-allreduce-algorithm-detailed.md)
 > **代码位置**: `megatron/core/distributed/param_and_grad_buffer.py`
 > **配置文件**: `megatron/core/distributed/distributed_data_parallel_config.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 
@@ -1120,7 +1120,7 @@ class _ParamAndGradBuffer:
 
 #### 6.2.1 Hook机制
 
-**文件路径**: `megatron/core/distributed/distributed_data_parallel.py:341-366`
+**文件路径**: `megatron/core/distributed/distributed_data_parallel.py`
 
 Megatron使用PyTorch的`grad_fn`Hook而非参数Hook，减少Python开销：
 
@@ -1300,7 +1300,7 @@ All-to-All的通信量更大，但提供了更高的数值精度。适用于训�
 
 ### 6.3 单元测试
 
-**测试文件**: `tests/unit_tests/distributed/test_data_parallel.py`
+**测试文件**: `tests/unit_tests/distributed/test_distributed_data_parallel.py`
 
 ```python
 import pytest
@@ -2418,6 +2418,6 @@ $$\text{Padding} \leq K \cdot (\text{lcm}(N, 128) - 1)$$
 ---
 
 **文档版本**: 1.0
-**最后更新**: 2025-12-30
+**最后更新**: 2026-05-10
 **作者**: LLM预训练知识库项目
 **基于**: Megatron-LM v0.12.0

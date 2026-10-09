@@ -3,8 +3,8 @@
 > **文档编号**: 02
 > **所属部分**: 第一部分 - 数学基础 (01-10)
 > **代码位置**: `megatron/core/optimizer/`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码)
-> **最后更新**: 2025-12-27
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
+> **最后更新**: 2026-05-10
 
 ---
 
@@ -1175,7 +1175,7 @@ class Float16OptimizerWithFloat16Params(MegatronOptimizer):
 
 #### 6.3.1 梯度裁剪
 
-**文件位置**: `megatron/core/optimizer/clip_grads.py:20-150`
+**文件位置**: `megatron/core/optimizer/clip_grads.py`
 
 ```python
 def clip_grad_by_total_norm_fp32(parameters, max_norm, norm_type=2):
@@ -1506,7 +1506,7 @@ $$
 
 **Megatron GPT-3 175B的设置**：
 ```python
-# examples/gpt3/train_gpt3_175b.sh
+# examples/gpt3/train_gpt3_175b_distributed.sh
 lr = 6e-5          # Peak learning rate
 min_lr = 6e-6      # Minimum learning rate (cosine decay的下限)
 ```

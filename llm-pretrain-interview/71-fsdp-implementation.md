@@ -56,7 +56,7 @@
 - [文档68](68-zero-1-optimizer-state-sharding.md)：ZeRO-1优化器状态分片
 - [文档69](69-zero-2-gradient-sharding.md)：ZeRO-2梯度分片
 - [文档70](70-zero-3-parameter-sharding.md)：ZeRO-3参数分片
-- [文档52](52-distributed-data-parallel.md)：分布式数据并行(DDP)
+- [文档52](52-distributed-data-parallel-detailed.md)：分布式数据并行(DDP)
 - [文档56-60](56-tensor-parallelism-theory.md)：张量并行系列
 
 ### 1.3 文档组织
@@ -71,14 +71,14 @@
 ### 1.4 代码位置
 
 > **核心实现文件**:
-> - `megatron/core/distributed/fsdp/mcore_fsdp_adapter.py:58-432` - Megatron FSDP适配器
-> - `megatron/core/distributed/torch_fully_sharded_data_parallel.py:28-155` - PyTorch FSDP包装
+> - `megatron/core/distributed/fsdp/mcore_fsdp_adapter.py` - Megatron FSDP适配器
+> - `megatron/core/distributed/torch_fully_sharded_data_parallel.py` - PyTorch FSDP包装
 > - `megatron/core/distributed/fsdp/src/megatron_fsdp/megatron_fsdp.py:71-297` - MegatronFSDP核心类
 > - `megatron/core/distributed/fsdp/src/megatron_fsdp/param_and_grad_buffer.py` - 参数和梯度缓冲区
 > - `megatron/core/distributed/fsdp/src/megatron_fsdp/fully_shard.py` - fully_shard实现
 
 > **相关配置**:
-> - `megatron/core/distributed/distributed_data_parallel_config.py:24-128` - FSDP配置项
+> - `megatron/core/distributed/distributed_data_parallel_config.py` - FSDP配置项
 
 ---
 
@@ -215,8 +215,8 @@ Megatron-LM的FSDP采用了清晰的三层架构：
 │  (Uses PyTorch 2.4+ fully_shard API)                    │
 ├─────────────────────────────────────────────────────────┤
 │  Layer 1: MegatronFSDP (Core Implementation)            │  ← FSDP核心逻辑
-│  File: megatron_fsdp/megatron_fsdp.py                   │
-│  File: megatron_fsdp/param_and_grad_buffer.py           │
+│  File: megatron/core/distributed/fsdp/src/megatron_fsdp/megatron_fsdp.py                   │
+│  File: megatron/core/distributed/fsdp/src/megatron_fsdp/param_and_grad_buffer.py           │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -366,7 +366,7 @@ loss = forward_backward_no_pipelining(model, data)
 
 | 类名 | 文件 | 作用 |
 |------|------|------|
-| `MegatronFSDP` | `megatron_fsdp.py` | FSDP核心引擎 |
+| `MegatronFSDP` | `megatron/core/distributed/fsdp/src/megatron_fsdp/megatron_fsdp.py` | FSDP核心引擎 |
 | `ParamAndGradBuffer` | `param_and_grad_buffer.py` | 参数梯度缓冲区 |
 | `AllGatherPipeline` | `param_and_grad_buffer.py` | All-Gather流水线 |
 | `GradReducePipeline` | `param_and_grad_buffer.py` | Reduce-Scatter流水线 |
@@ -1805,7 +1805,7 @@ class AllGatherPipeline:
 Megatron FSDP需要识别哪些参数已经被Tensor Parallelism分片，避免重复分片：
 
 ```python
-# File: megatron/core/distributed/fsdp/mcore_fsdp_adapter.py:151-187
+# File: megatron/core/distributed/fsdp/mcore_fsdp_adapter.py
 def _fix_tensor_parallel_attributes(self, module):
     """Mark parameters as TP-sharded to prevent FSDP from re-sharding.
 
@@ -2020,7 +2020,7 @@ class MegatronFSDP:
 **示例测试**（概念性）：
 
 ```python
-# tests/unit_tests/distributed/test_fsdp.py
+# tests/unit_tests/distributed/fsdp/test_mfsdp_fully_shard.py
 import torch
 import torch.distributed as dist
 from megatron.core.distributed.fsdp import FullyShardedDataParallel
@@ -2450,7 +2450,7 @@ Efficiency:
 | 模型可放入单GPU | `no_shard` | 最快，无通信开销 |
 | 优化器状态占主要内存 | `optim` | 节省75%优化器内存 |
 | 梯度+优化器内存瓶颈 | `optim_grads` | 节省87.5%梯度+优化器内存 |
-| 参数无法放入单GPU | `optim_grads_params` | 唯一选择（ZeRO-3） |
+| 参数无法放入单GPU | `optim_grads_params` | 常用选择（ZeRO-3/FSDP完整分片） |
 
 **性能影响**（GPT-13B，8 GPUs）：
 
@@ -2739,7 +2739,7 @@ def backward_with_recompute(layer, grad_output):
 Megatron使用**backward prefetch**协调FSDP和Activation Checkpointing：
 
 ```python
-# File: megatron/core/distributed/torch_fully_sharded_data_parallel.py:136-142
+# File: megatron/core/distributed/torch_fully_sharded_data_parallel.py
 if config.recompute_granularity is not None:
     sub_module.set_modules_to_backward_prefetch(
         [prev_module] if prev_module else []
@@ -3070,20 +3070,20 @@ model = HeterogeneousFSDP(
 ### 11.5 与其他文档的联系
 
 **前置文档**：
-- [文档52：分布式数据并行(DDP)](52-distributed-data-parallel.md) - FSDP的基础
+- [文档52：分布式数据并行(DDP)](52-distributed-data-parallel-detailed.md) - FSDP的基础
 - [文档68：ZeRO-1优化器状态分片](68-zero-1-optimizer-state-sharding.md) - FSDP的`optim`模式
 - [文档69：ZeRO-2梯度分片](69-zero-2-gradient-sharding.md) - FSDP的`optim_grads`模式
 - [文档70：ZeRO-3参数分片](70-zero-3-parameter-sharding.md) - FSDP的`optim_grads_params`模式
 
 **并行文档**：
 - [文档56-60：张量并行系列](56-tensor-parallelism-theory.md) - FSDP与TP的融合
-- [文档61-67：流水线并行系列](61-pipeline-parallelism-basics.md) - FSDP与PP的融合
-- [文档72：混合并行策略设计](72-hybrid-parallelism-strategy.md) - FSDP在3D/4D并行中的角色
+- [文档61-67：流水线并行系列](61-pipeline-parallelism-fundamentals.md) - FSDP与PP的融合
+- [文档72：混合并行策略设计](72-hybrid-parallelism-strategy-design.md) - FSDP在3D/4D并行中的角色
 - [文档73-75：序列/上下文并行](73-sequence-parallelism.md) - FSDP与CP的配合
 
 **后续文档**：
-- [文档72：混合并行策略设计](72-hybrid-parallelism-strategy.md) - 如何选择FSDP与其他并行策略的组合
-- [文档76-80：MoE系列](76-moe-basics.md) - FSDP在MoE模型中的应用
+- [文档72：混合并行策略设计](72-hybrid-parallelism-strategy-design.md) - 如何选择FSDP与其他并行策略的组合
+- [文档76-80：MoE系列](76-moe-fundamentals.md) - FSDP在MoE模型中的应用
 
 ---
 
@@ -3265,7 +3265,7 @@ $$
 ```python
 """
 Complete FSDP Training Example for GPT Model
-File: examples/fsdp_training.py
+File: fsdp_training.py (conceptual example)
 
 This example demonstrates:
 1. Initializing Megatron parallel groups
@@ -3440,7 +3440,7 @@ if __name__ == "__main__":
 ```python
 """
 FSDP + Tensor Parallelism Hybrid Example
-File: examples/fsdp_tp_hybrid.py
+File: fsdp_tp_hybrid.py (conceptual example)
 
 Configuration:
 - TP = 8 (within node, NVLink)
@@ -3650,7 +3650,7 @@ fp8:
 
 **文档状态**：✅ 已完成
 **文档版本**：v1.0
-**最后更新**：2026-01-01
+**最后更新**：2026-05-10
 **作者**：Claude (Anthropic)
 **审核状态**：待审核
 

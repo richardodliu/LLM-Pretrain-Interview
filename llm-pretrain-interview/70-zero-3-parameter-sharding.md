@@ -1426,7 +1426,7 @@ ddp_config = DistributedDataParallelConfig(
 
 **文档版本**: 1.0
 **最后更新**: 2026-01-01
-**作者**: 基于Megatron-LM v0.12.0
+**作者**: 基于 Megatron-LM v0.12.0
 
 **下一文档**: [71. FSDP实现详解](71-fsdp-implementation.md)
 **上一文档**: [69. ZeRO-2：梯度分片](69-zero-2-gradient-sharding.md)

@@ -3,8 +3,8 @@
 > **文档编号**: 22
 > **所属部分**: 第三部分 - Transformer基础架构 (21-30)
 > **对应原文档**: 02-transformer-core.md
-> **代码位置**: `megatron/core/transformer/attention.py:1014-1349`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码位置**: `megatron/core/transformer/attention.py`
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ## 目录
 
@@ -572,7 +572,7 @@ $$
 
 **Megatron 实现**：
 
-**文件路径**：`megatron/core/fusions/fused_layer_norm.py:122-129`
+**文件路径**：`megatron/core/fusions/fused_layer_norm.py`
 
 ```python
 def reset_parameters(self):
@@ -586,7 +586,7 @@ def reset_parameters(self):
 
 **前向传播时调整**：
 
-**文件路径**：`megatron/core/fusions/fused_layer_norm.py:131-133`
+**文件路径**：`megatron/core/fusions/fused_layer_norm.py`
 
 ```python
 def forward(self, input: Tensor) -> Tensor:
@@ -681,7 +681,7 @@ $$
 
 ### 7.1 TransformerLayer 的整体结构
 
-**文件路径**：`megatron/core/transformer/transformer_layer.py:254-952`
+**文件路径**：`megatron/core/transformer/transformer_layer.py`
 
 **类定义**：
 
@@ -713,7 +713,7 @@ class TransformerLayer(GraphableMegatronModule, BaseTransformerLayer):
 
 **核心组件**：
 
-**文件路径**：`megatron/core/transformer/transformer_layer.py:283-373`
+**文件路径**：`megatron/core/transformer/transformer_layer.py`
 
 ```python
         # [Module 1: Input LayerNorm] 输入归一化
@@ -752,7 +752,7 @@ class TransformerLayer(GraphableMegatronModule, BaseTransformerLayer):
 
 ### 7.2 前向传播：Attention 子层
 
-**文件路径**：`megatron/core/transformer/transformer_layer.py:439-569`
+**文件路径**：`megatron/core/transformer/transformer_layer.py`
 
 ```python
 def _forward_attention(
@@ -862,7 +862,7 @@ def bias_dropout_add_fused(output, bias, residual, dropout_prob):
 
 ### 7.3 前向传播：MLP 子层
 
-**文件路径**：`megatron/core/transformer/transformer_layer.py:571-678`
+**文件路径**：`megatron/core/transformer/transformer_layer.py`
 
 ```python
 def _forward_mlp(self, hidden_states, inference_context=None):
@@ -956,7 +956,7 @@ $$
 
 ### 7.4 完整的 forward 方法
 
-**文件路径**：`megatron/core/transformer/transformer_layer.py:424-437`
+**文件路径**：`megatron/core/transformer/transformer_layer.py`
 
 ```python
 def forward(self, *args, **kwargs):
@@ -1334,7 +1334,7 @@ if self.config.recompute_granularity == 'full' and self.training:
 
 **代码实现**：
 
-**文件路径**：`megatron/core/transformer/transformer_layer.py:378-400`
+**文件路径**：`megatron/core/transformer/transformer_layer.py`
 
 ```python
 if self.config.recompute_granularity == 'selective':
@@ -1351,7 +1351,7 @@ if self.config.recompute_granularity == 'selective':
 
 **前向传播中的应用**：
 
-**文件路径**：`megatron/core/transformer/transformer_layer.py:490-496`
+**文件路径**：`megatron/core/transformer/transformer_layer.py`
 
 ```python
 # LayerNorm 重计算
@@ -1680,10 +1680,11 @@ $$
 
 有残差：
 $$
-\left\|\frac{\partial \mathcal{L}}{\partial \mathbf{X}^{(\ell)}}\right\| \geq \left\|\frac{\partial \mathcal{L}}{\partial \mathbf{X}^{(L)}}\right\|
+\frac{\partial \mathcal{L}}{\partial \mathbf{X}^{(\ell)}} =
+\frac{\partial \mathcal{L}}{\partial \mathbf{X}^{(L)}} \prod_{k=\ell}^{L-1}(I + J_k)
 $$
 
-残差保证了梯度至少不会消失。
+残差项提供恒等路径，通常能改善梯度传播条件；实际梯度范数仍取决于各层Jacobian的大小和方向。
 
 ---
 

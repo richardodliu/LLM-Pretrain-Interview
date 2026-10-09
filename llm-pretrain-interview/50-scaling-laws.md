@@ -3,7 +3,7 @@
 > **文档编号**: 50
 > **所属部分**: 第五部分 - 模型架构 (41-50)
 > **代码位置**: `megatron/core/models/gpt/gpt_model.py`, `megatron/core/transformer/transformer_config.py:930-1012`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码和实证研究)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码和实证研究)
 > **关键论文**:
 > - Kaplan et al., "Scaling Laws for Neural Language Models", 2020
 > - Hoffmann et al., "Training Compute-Optimal Large Language Models (Chinchilla)", 2022

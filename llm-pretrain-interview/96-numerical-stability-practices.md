@@ -24,11 +24,11 @@
 12. [参考文献](#12-参考文献)
 
 **附录**:
-- [A. 数学推导补充](#附录a-数学推导补充)
-- [B. 代码完整示例](#附录b-代码完整示例)
-- [C. 配置文件示例](#附录c-配置文件示例)
-- [D. 术语表](#附录d-术语表)
-- [E. 常用公式速查](#附录e-常用公式速查)
+- [A. 数学推导补充](#附录a数学推导补充)
+- [B. 代码完整示例](#附录b代码完整示例)
+- [C. 配置文件示例](#附录c配置文件示例)
+- [D. 术语表](#附录d术语表)
+- [E. 常用公式速查](#附录e常用公式速查)
 
 ---
 
@@ -80,10 +80,10 @@
 - 混合精度训练原理
 
 **相关概念**:
-- [文档08: 浮点数表示](/llm-pretrain-interview/08-floating-point-representation.md)
-- [文档07: 数值稳定性理论](/llm-pretrain-interview/07-numerical-stability-theory.md)
-- [文档93: 混合精度训练原理](/llm-pretrain-interview/93-mixed-precision-training.md)
-- [文档94: 损失缩放技术](/llm-pretrain-interview/94-loss-scaling.md)
+- [文档08: 浮点数表示](08-floating-point-representation.md)
+- [文档07: 数值稳定性理论](07-numerical-stability-theory.md)
+- [文档93: 混合精度训练原理](93-mixed-precision-training.md)
+- [文档94: 损失缩放技术](94-loss-scaling-technique.md)
 
 ### 1.3 文档组织
 
@@ -96,9 +96,9 @@
 
 ### 1.4 代码位置
 
-> **核心模块**: `megatron/core/fusions/fused_softmax.py:179-360`
-> **核心模块**: `megatron/core/transformer/torch_norm.py:54-97`
-> **核心模块**: `megatron/core/optimizer/grad_scaler.py:108-143`
+> **核心模块**: `megatron/core/fusions/fused_softmax.py`
+> **核心模块**: `megatron/core/transformer/torch_norm.py`
+> **核心模块**: `megatron/core/optimizer/grad_scaler.py`
 > **核心模块**: `megatron/core/optimizer/optimizer.py:488-554`
 
 **相关文件**:
@@ -772,7 +772,7 @@ Input: model, optimizer, loss_fn, data_loader
 
 ### 6.1 FusedScaleMaskSoftmax核心实现
 
-**文件路径**: `megatron/core/fusions/fused_softmax.py:179-360`
+**文件路径**: `megatron/core/fusions/fused_softmax.py`
 
 ```python
 class FusedScaleMaskSoftmax(nn.Module):
@@ -959,7 +959,7 @@ __global__ void scaled_masked_softmax_kernel(
 
 ### 6.2 稳定LayerNorm实现
 
-**文件路径**: `megatron/core/transformer/torch_norm.py:54-97`
+**文件路径**: `megatron/core/transformer/torch_norm.py`
 
 ```python
 class L2Norm(torch.nn.Module):
@@ -1237,7 +1237,7 @@ void _amp_foreach_non_finite_check_and_unscale_(
 
 ### 6.4 DynamicGradScaler实现
 
-**文件路径**: `megatron/core/optimizer/grad_scaler.py:53-143`
+**文件路径**: `megatron/core/optimizer/grad_scaler.py`
 
 ```python
 class DynamicGradScaler(MegatronGradScaler):
@@ -2362,19 +2362,19 @@ Adam状态占用 $2 \times \text{params}$ 的FP32内存。
 ### 11.5 与其他文档的联系
 
 **前置文档**:
-- [文档07: 数值稳定性理论](/llm-pretrain-interview/07-numerical-stability-theory.md) - 理论基础
-- [文档08: 浮点数表示](/llm-pretrain-interview/08-floating-point-representation.md) - IEEE 754标准
-- [文档93: 混合精度训练原理](/llm-pretrain-interview/93-mixed-precision-training.md) - FP16/BF16基础
-- [文档94: 损失缩放技术](/llm-pretrain-interview/94-loss-scaling.md) - Loss Scaling深入
+- [文档07: 数值稳定性理论](07-numerical-stability-theory.md) - 理论基础
+- [文档08: 浮点数表示](08-floating-point-representation.md) - IEEE 754标准
+- [文档93: 混合精度训练原理](93-mixed-precision-training.md) - FP16/BF16基础
+- [文档94: 损失缩放技术](94-loss-scaling-technique.md) - Loss Scaling深入
 
 **后续文档**:
-- [文档97: 数据预处理与Tokenization](/llm-pretrain-interview/97-data-preprocessing-tokenization.md)
-- [文档100: 完整训练流程实战](/llm-pretrain-interview/100-complete-training-workflow.md)
+- [文档97: 数据预处理与Tokenization](97-data-preprocessing-tokenization.md)
+- [文档100: 完整训练流程实战](100-complete-training-workflow.md)
 
 **相关文档**:
-- [文档13: 归一化技术](/llm-pretrain-interview/13-normalization-techniques.md) - LayerNorm理论
-- [文档23: 缩放点积注意力](/llm-pretrain-interview/23-scaled-dot-product-attention.md) - Softmax应用
-- [文档90: 梯度裁剪](/llm-pretrain-interview/90-gradient-clipping.md) - 梯度稳定性
+- [文档13: 归一化技术](13-normalization-techniques.md) - LayerNorm理论
+- [文档23: 缩放点积注意力](23-scaled-dot-product-attention.md) - Softmax应用
+- [文档90: 梯度裁剪](90-gradient-clipping.md) - 梯度稳定性
 
 ---
 
@@ -3268,8 +3268,8 @@ $$
 ---
 
 **文档版本**: 1.0
-**最后更新**: 2026-01-01
-**作者**: Claude (基于Megatron-LM v0.12.0)
+**最后更新**: 2026-05-10
+**作者**: Claude (基于 Megatron-LM v0.12.0)
 **总字数**: ~24,000字
 **代码行数**: ~3,100行
 

@@ -183,7 +183,7 @@ $$
 - $\ell_i^{(e)}$ 表示token $i$对专家$e$的"亲和度"
 - 更高的logit意味着token应该更倾向于被该专家处理
 
-**代码位置**：`megatron/core/transformer/moe/router.py:78-100` (gating函数)
+**代码位置**：`megatron/core/transformer/moe/router.py` (gating函数)
 
 #### 4.1.2 Noisy Top-K Gating (Shazeer et al., 2017)
 
@@ -202,7 +202,7 @@ $$
 **Megatron-LM实现**：通过`moe_input_jitter_eps`参数实现类似功能（输入扰动）：
 
 ```python
-# megatron/core/transformer/moe/router.py:465-484
+# megatron/core/transformer/moe/router.py
 def apply_input_jitter(self, input: torch.Tensor):
     if self.config.moe_input_jitter_eps is not None:
         eps = self.config.moe_input_jitter_eps
@@ -912,7 +912,7 @@ def soft_moe_forward(X, experts, A):
 ### 6.1 Megatron-LM Router类层次结构
 
 ```python
-# megatron/core/transformer/moe/router.py:27-129
+# megatron/core/transformer/moe/router.py
 class Router(ABC, MegatronModule):
     """Base Router class"""
 
@@ -970,7 +970,7 @@ class Router(ABC, MegatronModule):
 #### 6.2.1 初始化
 
 ```python
-# megatron/core/transformer/moe/router.py:130-202
+# megatron/core/transformer/moe/router.py
 class TopKRouter(Router):
     def __init__(self, config: TransformerConfig,
                  pg_collection: Optional[ProcessGroupCollection] = None):
@@ -1016,7 +1016,7 @@ class TopKRouter(Router):
 #### 6.2.2 Routing函数
 
 ```python
-# megatron/core/transformer/moe/router.py:496-557
+# megatron/core/transformer/moe/router.py
 def routing(self, logits: torch.Tensor):
     seq_length, bsz = logits.shape[:2]
     logits = logits.view(-1, self.config.num_moe_experts)  # [T, E]
@@ -1153,7 +1153,7 @@ def topk_routing_with_score_function(
 #### 6.2.4 辅助损失应用
 
 ```python
-# megatron/core/transformer/moe/router.py:270-296
+# megatron/core/transformer/moe/router.py
 def _apply_aux_loss(
     self, probs: torch.Tensor,
     scores_for_aux_loss: torch.Tensor,
@@ -1271,7 +1271,7 @@ $$
 ### 6.4 Sinkhorn路由实现
 
 ```python
-# megatron/core/transformer/moe/router.py:215-246
+# megatron/core/transformer/moe/router.py
 def sinkhorn_load_balancing(self, logits: torch.Tensor):
     def _sinkhorn_activation(logits):
         if self.topk == 1:
@@ -1798,7 +1798,7 @@ def get_capacity_factor(step, total_steps):
 **Megatron-LM实现**：
 
 ```python
-# megatron/core/transformer/moe/router.py:487-495
+# megatron/core/transformer/moe/router.py
 @jit_fuser
 def _apply_expert_bias(self, routing_map: torch.Tensor):
     if self.enable_expert_bias and torch.is_grad_enabled():

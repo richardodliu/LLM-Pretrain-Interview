@@ -3,7 +3,7 @@
 > **文档编号**: 13
 > **所属部分**: 第二部分 - 深度学习基础 (11-20)
 > **代码位置**: `megatron/core/transformer/torch_norm.py`, `megatron/core/fusions/fused_layer_norm.py`, `megatron/legacy/model/rms_norm.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 
@@ -69,9 +69,9 @@
 ### 1.4 代码位置
 
 > **核心文件**:
-> - `megatron/core/transformer/torch_norm.py:9-97` - PyTorch原生归一化包装器(LayerNorm/RMSNorm)
-> - `megatron/core/fusions/fused_layer_norm.py:30-170` - 融合LayerNorm实现(使用Apex)
-> - `megatron/legacy/model/rms_norm.py:6-33` - 自定义RMSNorm实现
+> - `megatron/core/transformer/torch_norm.py` - PyTorch原生归一化包装器(LayerNorm/RMSNorm)
+> - `megatron/core/fusions/fused_layer_norm.py` - 融合LayerNorm实现(使用Apex)
+> - `megatron/legacy/model/rms_norm.py` - 自定义RMSNorm实现
 > - `megatron/core/transformer/transformer_config.py:189-190` - 归一化配置
 
 > **相关文件**:
@@ -744,7 +744,7 @@ y_fp16 = y_fp32.half()
 
 ### 8.1 WrappedTorchNorm: PyTorch原生归一化
 
-**文件**: `megatron/core/transformer/torch_norm.py:9-97`
+**文件**: `megatron/core/transformer/torch_norm.py`
 
 这是一个条件包装器，根据配置选择PyTorch原生的LayerNorm或RMSNorm。
 
@@ -824,7 +824,7 @@ norm_layer = WrappedTorchNorm(
 
 ### 8.2 自定义RMSNorm实现
 
-**文件**: `megatron/legacy/model/rms_norm.py:6-33`
+**文件**: `megatron/legacy/model/rms_norm.py`
 
 这是Megatron早期的自定义RMSNorm实现，用于不支持原生RMSNorm的PyTorch版本。
 
@@ -908,7 +908,7 @@ class RMSNorm(torch.nn.Module):
 
 ### 8.3 FusedLayerNorm: 融合CUDA实现
 
-**文件**: `megatron/core/fusions/fused_layer_norm.py:30-170`
+**文件**: `megatron/core/fusions/fused_layer_norm.py`
 
 这是高性能的融合LayerNorm实现，使用Apex库的CUDA kernel。
 

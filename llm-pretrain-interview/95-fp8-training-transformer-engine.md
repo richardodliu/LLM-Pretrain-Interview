@@ -79,7 +79,7 @@ TransformerEngine通过**多种量化策略** (Delayed Scaling, Tensorwise Scali
 
 ### 1.4 代码位置
 
-> **核心代码文件**: `megatron/core/fp8_utils.py:1-786`
+> **核心代码文件**: `megatron/core/fp8_utils.py`
 >
 > **相关文件**:
 > - `megatron/core/enums.py:21-36` - FP8/FP4 Recipe枚举定义
@@ -89,7 +89,7 @@ TransformerEngine通过**多种量化策略** (Delayed Scaling, Tensorwise Scali
 > - `megatron/core/optimizer/distrib_optimizer.py` - 分布式优化器FP8支持
 
 **测试文件**:
-- `tests/unit_tests/transformer/test_fp8_utils.py`
+- `tests/unit_tests/test_fp8_utils.py`
 
 **TransformerEngine仓库**:
 - GitHub: https://github.com/NVIDIA/TransformerEngine
@@ -200,7 +200,7 @@ fp8_wgrad: bool = True                   # 是否对权重梯度使用FP8
 fp8_dot_product_attention: bool = False  # 是否对Attention QK^T使用FP8
 ```
 
-**与Megatron并行策略的集成** (`megatron/core/fp8_utils.py:197-511`):
+**与Megatron并行策略的集成** (`megatron/core/fp8_utils.py`):
 - **张量并行(TP)**: FP8参数的ColumnParallel/RowParallel切分
 - **流水线并行(PP)**: FP8激活的P2P通信
 - **序列并行(SP)**: FP8激活的AllGather/ReduceScatter
@@ -1215,7 +1215,7 @@ function UPDATE_AND_QUANTIZE_FP8_PARAMS(
 
 #### 6.1.1 FP8张量检测与反量化
 
-**文件路径**: `megatron/core/fp8_utils.py:96-119`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 ```python
 def is_float8tensor(tensor: torch.Tensor) -> bool:
@@ -1286,7 +1286,7 @@ def dequantize_fp8_tensor(fp8_tensor: torch.Tensor) -> torch.Tensor:
 
 #### 6.1.2 FP8对齐要求
 
-**文件路径**: `megatron/core/fp8_utils.py:168-174`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 ```python
 def get_fp8_align_size(fp8_recipe: Fp8Recipe) -> int:
@@ -1332,7 +1332,7 @@ H100的FP8 Tensor Core硬件设计要求:
 
 #### 6.1.3 并行层类型判断
 
-**文件路径**: `megatron/core/fp8_utils.py:176-195`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 ```python
 def is_column_parallel_linear(module):
@@ -1397,7 +1397,7 @@ elif is_row_parallel_linear(module):
 
 #### 6.2.1 底层存储替换 (`modify_underlying_storage`)
 
-**文件路径**: `megatron/core/fp8_utils.py:222-282` (TE 2.2+实现)
+**文件路径**: `megatron/core/fp8_utils.py` (TE 2.2+实现)
 
 **背景**: 分布式数据并行(DDP)将所有参数放入连续缓冲区以优化通信。对于FP8参数,其底层存储(`._data`)不是标准PyTorch张量,需要特殊处理。
 
@@ -1452,7 +1452,7 @@ def _modify_underlying_storage_impl(
 
 #### 6.2.2 FP32→FP8参数量化 (`quantize_param_shard`)
 
-**文件路径**: `megatron/core/fp8_utils.py:233-266` (TE 2.2+实现)
+**文件路径**: `megatron/core/fp8_utils.py` (TE 2.2+实现)
 
 **背景**: 分布式优化器将FP32主权重分片到各个rank。前向传播前,需要将更新后的FP32分片量化为FP8参数。
 
@@ -1601,7 +1601,7 @@ def _quantize_param_shard_impl(
 
 #### 6.2.3 Amax历史校正 (TE 1.x)
 
-**文件路径**: `megatron/core/fp8_utils.py:446-458`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 **问题**: TE 1.x中,某些inplace操作(如`tensor.copy_()`)会错误地修改`amax_history`,导致缩放因子计算错误。
 
@@ -1642,7 +1642,7 @@ TE 2.x重新设计了量化器接口,amax_history的管理更加健壮,避免了
 
 #### 6.3.1 Recipe创建 (`get_fp8_recipe`)
 
-**文件路径**: `megatron/core/fp8_utils.py:536-594`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 ```python
 def get_fp8_recipe(config: TransformerConfig):
@@ -1755,7 +1755,7 @@ class TEDelayedScaling:
 
 #### 6.3.2 FP8 Context创建 (`get_fp8_context`)
 
-**文件路径**: `megatron/core/fp8_utils.py:596-654`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 ```python
 def get_fp8_context(
@@ -1901,7 +1901,7 @@ def get_amax_reduction_group(with_context_parallel=False, tp_only_amax_red=False
 
 #### 6.4.1 序列Padding包装器 (`prepare_model_for_fp8_inference`)
 
-**文件路径**: `megatron/core/fp8_utils.py:757-776`
+**文件路径**: `megatron/core/fp8_utils.py`
 
 **背景**: FP8 Tensor Core要求序列长度是16(或32)的倍数。推理时输入序列长度可变,需要动态padding。
 

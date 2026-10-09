@@ -2,7 +2,7 @@
 
 **版本**: 3.4
 
-**最后更新**: 2026-01-02
+**最后更新**: 2026-05-10
 
 **用途**: 汇总本知识库涉及的所有官方资源、相关框架和核心论文，供模型编写文档和读者学习时参考
 
@@ -233,7 +233,10 @@
 | Adam | Kingma & Ba | 2015 | ICLR | 1412.6980 |
 | AdamW (Decoupled Weight Decay) | Loshchilov & Hutter | 2019 | ICLR | 1711.05101 |
 | **AMSGrad (On the Convergence of Adam and Beyond)** | **Reddi, Kale, & Kumar** | **2018** | **ICLR** | **1904.09237** |
+| Adafactor: Adaptive Learning Rates with Sublinear Memory Cost | Shazeer & Stern | 2018 | ICML | 1804.04235 |
+| On the adequacy of untuned warmup for adaptive optimization | Ma & Yarats | 2019 | arXiv | 1910.04209 |
 | **Lion: Symbolic Discovery of Optimization Algorithms** | **Chen et al.** | **2023** | **arXiv** | **2302.06675** |
+| SOAP: Improving and Stabilizing Shampoo using Adam | Vyas et al. | 2024 | arXiv | 2409.11321 |
 | **Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour** | **Goyal et al.** | **2017** | **arXiv** | **1706.02677** |
 | **On Large-Batch Training for Deep Learning: Generalization Gap and Sharp Minima** | **Keskar et al.** | **2017** | **ICLR** | **1609.04836** |
 | **Cyclical Learning Rates for Training Neural Networks** | **Smith** | **2017** | **IEEE WACV** | **1506.01186** |
@@ -367,14 +370,21 @@
 | **82** | **Nesterov加速梯度(NAG)** | **Nesterov (1983), Sutskever et al. (2013), Ruder (2016), Su et al. (2014)** |
 | **83** | **自适应学习率：AdaGrad/RMSProp** | **Duchi et al. (2011), Tieleman & Hinton (2012), Zeiler (2012), Ruder (2016)** |
 | **84** | **Adam优化器详解** | **Kingma & Ba (2015), Reddi et al. (2018)** |
+| **85** | **AdamW：解耦权重衰减** | **Loshchilov & Hutter (2019), Kingma & Ba (2015)** |
+| **86** | **学习率调度策略** | **Vaswani et al. (2017), Smith (2017), Ma & Yarats (2019)** |
 | **87** | **二阶优化方法概览** | **Newton法, L-BFGS (Liu & Nocedal, 1989), 自然梯度 (Amari, 1998), K-FAC (Martens & Grosse, 2015)** |
 | **88** | **分布式优化器详解** | **ZeRO (Rajbhandari et al., 2020), FSDP (Zhao et al., 2023), Megatron-LM v2 (2021)** |
+| **89** | **优化器状态管理** | **Megatron-LM, ZeRO, PyTorch Optimizer state_dict** |
+| **90** | **梯度裁剪** | **Pascanu et al. (2013), Zhang et al. (2019), Megatron-LM clip_grads.py** |
+| **91** | **混合优化策略** | **AdamW, Megatron-LM, ZeRO, Mixed Precision Training** |
+| **92** | **优化器选择与调优** | **AdamW, Adafactor, Lion, SOAP, Megatron-LM optimizer config** |
 | 93-96 | 混合精度 | Mixed Precision Training (2018) |
 | **95** | **FP8训练与TransformerEngine** | **FP8 Formats for Deep Learning (Micikevicius et al., 2022)** |
 | **96** | **数值稳定性实践** | **Wilkinson (1963), Higham (2002), Blanchard et al. (2019), Nguyen & Salazar (2019)** |
 | **97** | **数据预处理与Tokenization** | **Sennrich et al. (2016), Schuster & Nakajima (2012), Kudo & Richardson (2018)** |
 | **98** | **数据加载与索引化** | **Lim et al. (2022), NumPy memmap 文档** |
-| 95 | FP8训练 | Transformer Engine文档 |
+| **99** | **数据混合与采样策略** | **Data Mixing, Curriculum Learning, Megatron-LM indexed datasets** |
+| **100** | **完整训练流程** | **Megatron-LM training loop, checkpointing, scheduler, monitoring** |
 
 ---
 

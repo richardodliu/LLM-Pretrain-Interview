@@ -3073,7 +3073,7 @@ if args.use_dist_ckpt:
 **从HuggingFace转换到Megatron**：
 
 ```python
-# tools/checkpoint_conversion/hf_to_megatron.py
+# 示例文件名: hf_to_megatron.py
 
 def convert_hf_to_megatron(hf_model_path, megatron_args):
     """Convert HuggingFace checkpoint to Megatron format."""
@@ -3117,7 +3117,7 @@ def convert_hf_to_megatron(hf_model_path, megatron_args):
 **从Megatron转换到HuggingFace**：
 
 ```python
-# tools/checkpoint_conversion/megatron_to_hf.py
+# 示例函数: convert_megatron_to_hf
 
 def convert_megatron_to_hf(megatron_checkpoint_path, hf_output_path):
     """Convert Megatron checkpoint to HuggingFace format."""
@@ -3162,7 +3162,7 @@ def convert_megatron_to_hf(megatron_checkpoint_path, hf_output_path):
 **并行配置转换**：
 
 ```python
-# tools/checkpoint_conversion/change_tp_pp.py
+# 示例文件名: change_tp_pp.py
 
 def change_parallel_config(
     input_checkpoint,
@@ -4044,7 +4044,7 @@ final_groups = [state_dict_groups[1], state_dict_groups[2], state_dict_groups[0]
 ### C.1 训练脚本
 
 ```python
-# pretrain_gpt_with_checkpointing.py
+# pretrain_gpt.py
 
 import os
 import torch

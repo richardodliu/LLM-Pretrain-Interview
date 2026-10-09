@@ -5,11 +5,11 @@
 > **前置文档**: [51-数据并行原理与数学推导](./51-data-parallelism-fundamentals.md)
 > **代码位置**: `megatron/core/distributed/distributed_data_parallel.py`
 > **配置文件**: `megatron/core/distributed/distributed_data_parallel_config.py`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM仓库实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码)
 
 ---
 
-## 引言
+## 1. 引言
 
 ### 背景与动机
 
@@ -408,7 +408,7 @@ _ParamAndGradBucketGroup (桶组)
 
 #### 3.2.1 `_BaseDataParallel`
 
-**代码位置**: `megatron/core/distributed/data_parallel_base.py:21-97`
+**代码位置**: `megatron/core/distributed/data_parallel_base.py`
 
 ```python
 class _BaseDataParallel(MegatronModule):
@@ -439,7 +439,7 @@ class _BaseDataParallel(MegatronModule):
 
 #### 3.2.2 `DistributedDataParallel`
 
-**代码位置**: `megatron/core/distributed/distributed_data_parallel.py:23-593`
+**代码位置**: `megatron/core/distributed/distributed_data_parallel.py`
 
 核心成员变量:
 
@@ -1627,7 +1627,7 @@ for batch in dataloader:
 
 #### 反向Hook注册
 
-**代码位置**: `megatron/core/distributed/distributed_data_parallel.py:338-366`
+**代码位置**: `megatron/core/distributed/distributed_data_parallel.py`
 
 ```python
 def __init__(self, ...):
@@ -2859,7 +2859,7 @@ $$
 
 #### `DistributedDataParallelConfig` 完整参数
 
-**代码位置**: `megatron/core/distributed/distributed_data_parallel_config.py:8-172`
+**代码位置**: `megatron/core/distributed/distributed_data_parallel_config.py`
 
 ```python
 @dataclass
@@ -4248,7 +4248,7 @@ srun python -u pretrain_gpt.py \
 
 **文档状态**: ✅ 已完成
 **字数统计**: ~27,000 行
-**代码覆盖率**: 100% (基于Megatron-LM v0.12.0)
-**最后更新**: 2025-12-29
+**代码锚点**: 已标注关键实现参考 (基于 Megatron-LM v0.12.0)
+**最后更新**: 2026-05-10
 
 ---

@@ -2,9 +2,9 @@
 
 > **文档编号**: 20
 > **所属部分**: 第二部分 - 深度学习基础 (11-20)
-> **代码位置**: `megatron/core/utils.py:815-824`, `megatron/core/optimizer_param_scheduler.py:1-350`
+> **代码位置**: `megatron/core/utils.py:815-824`, `megatron/core/optimizer_param_scheduler.py`
 > **配置文件**: `megatron/core/transformer/transformer_config.py:174-182`
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM v0.12.0实际代码)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM v0.12.0 实际代码)
 
 ---
 
@@ -14,7 +14,7 @@
 2. [相关工作](#2-相关工作)
 3. [符号定义](#3-符号定义)
 4. [权重初始化的重要性](#4-权重初始化的重要性)
-5. [Xavier/Glorot初始化](#5-xavierglotot初始化)
+5. [Xavier/Glorot初始化](#5-xavierglorot初始化)
 6. [He初始化](#6-he初始化)
 7. [Transformer特有的初始化策略](#7-transformer特有的初始化策略)
 8. [学习率预热的数学意义](#8-学习率预热的数学意义)
@@ -335,8 +335,8 @@ $$a = \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}$$
 ### 5.2 几何直觉
 
 **Xavier初始化的几何意义**:
-- **前向**: 保证激活值不会太大或太小
-- **反向**: 保证梯度不会太大或太小
+- **前向**: 让激活值方差保持在合理范围
+- **反向**: 让梯度方差保持在合理范围
 - **折衷**: 在两个目标之间找到平衡
 
 **可视化**:
@@ -754,7 +754,7 @@ $$\lambda(t) = \lambda_{\text{start}} + (\lambda_{\text{end}} - \lambda_{\text{s
 
 ### 10.5 在Megatron中的实现
 
-**文件**: `megatron/core/optimizer_param_scheduler.py:98-130`
+**文件**: `megatron/core/optimizer_param_scheduler.py`
 
 ```python
 def get_wd(self, param_group: Optional[dict] = None) -> float:

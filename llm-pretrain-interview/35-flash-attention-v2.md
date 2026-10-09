@@ -3,8 +3,8 @@
 > **文档编号**: 35
 > **所属部分**: 第四部分 - 高级注意力机制 (31-40)
 > **对应原文档**: FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning (Dao, 2023)
-> **代码位置**: `megatron/core/transformer/attention.py:85-88` (Flash Attention 集成)
-> **代码覆盖率**: ✅ 100% (所有内容均基于Megatron-LM 仓库实际代码和Flash Attention v2论文)
+> **代码位置**: `megatron/core/transformer/attention.py` (Flash Attention 集成)
+> **代码锚点**: ✅ 已标注关键实现参考 (关键内容参考 Megatron-LM 仓库实际代码和Flash Attention v2论文)
 
 ---
 
@@ -200,7 +200,7 @@ ICLR 2024.
 Megatron-LM 自动检测并使用最新版本的 Flash Attention：
 
 ```python
-# megatron/core/transformer/attention.py:85-88
+# megatron/core/transformer/attention.py
 try:
     from flash_attn import flash_attn_varlen_func, flash_attn_with_kvcache
 except:
@@ -647,7 +647,7 @@ Algorithm 5.2: Warp 级 Flash Attention (v2)
 
 #### 6.1.1 Flash Attention v2 库导入 (与 v1 相同)
 
-**文件路径**: `megatron/core/transformer/attention.py:85-88`
+**文件路径**: `megatron/core/transformer/attention.py`
 
 ```python
 try:
@@ -1295,6 +1295,6 @@ python -c "import flash_attn; print(flash_attn.__version__)"
 Flash Attention v2 在 v1 的基础上实现了进一步的性能飞跃，是当前大语言模型训练的**事实标准**。掌握 v2 的原理和使用，对于高效训练 LLM 至关重要。
 
 **下一步学习**：
-- [文档 36: Flash Attention v3 与 FP8](./36-flash-attention-v3.md)
-- [文档 39: 长序列注意力优化技术](./39-long-sequence-attention.md)
+- [文档 36: Flash Attention v3 与 FP8](./36-flash-attention-v3-fp8.md)
+- [文档 39: 长序列注意力优化技术](./39-long-context-attention-optimization.md)
 - [文档 31: GQA - 与 Flash Attention 的完美组合](./31-grouped-query-attention.md)
